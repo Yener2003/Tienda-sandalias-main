@@ -382,25 +382,37 @@ body {
   margin-right: 0.5rem;
 }
 
-/* ===== DETALLE PRODUCTO ===== */
+/* ===== DETALLE PRODUCTO PREMIUM ===== */
 .portfolio-details {
-  padding: 4rem 0;
+  padding: 5rem 0;
+  background: linear-gradient(180deg, var(--bg-main) 0%, var(--bg-secondary) 100%);
 }
 
 .portfolio-info {
-  background: var(--bg-secondary);
-  border-radius: 16px;
-  padding: 2rem;
-  box-shadow: var(--card-shadow);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px; /* Bordes más fluidos */
+  padding: 2.5rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s ease;
+}
+
+[data-theme='dark'] .portfolio-info {
+  background: rgba(0, 0, 0, 0.2);
+  border-color: rgba(201, 168, 76, 0.1);
 }
 
 .portfolio-info h3 {
-  color: var(--text-main);
-  font-size: 1.4rem;
-  font-weight: 700;
-  margin-bottom: 1.2rem;
-  padding-bottom: 0.8rem;
-  border-bottom: 2px solid var(--primary-color);
+  color: var(--primary-color);
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .portfolio-info ul {
@@ -410,10 +422,13 @@ body {
 }
 
 .portfolio-info li {
-  padding: 0.6rem 0;
+  padding: 1rem 0;
   border-bottom: 1px solid var(--border-color);
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .portfolio-info li:last-child {
@@ -422,6 +437,23 @@ body {
 
 .portfolio-info strong {
   color: var(--text-main);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.portfolio-info strong i {
+  color: var(--primary-color);
+  font-size: 1.1rem;
+}
+
+/* Carrusel Detalle */
+.swiper-container-wrapper {
+  border-radius: 32px; /* Ultra redondeado */
+  overflow: hidden;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+  background: var(--bg-secondary);
 }
 
 /* Swiper custom */
