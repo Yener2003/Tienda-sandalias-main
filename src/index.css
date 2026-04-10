@@ -679,6 +679,115 @@ body {
   border-color: var(--border-color);
 }
 
+
 [data-theme='dark'] .producto-card {
   background-color: var(--bg-secondary);
+}
+
+/* ===== RESPONSIVIDAD AVANZADA (MOBILE FIRST) ===== */
+
+/* Transformación de tabla en tarjetas para móviles */
+@media (max-width: 768px) {
+  .table-responsive {
+    border: none;
+  }
+
+  table.table-hover thead {
+    display: none; /* Ocular cabecera en móvil */
+  }
+
+  table.table-hover tbody tr {
+    display: block;
+    margin-bottom: 1.5rem;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border-color);
+    position: relative;
+  }
+
+  table.table-hover tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: none;
+    padding: 0.5rem 0;
+    text-align: right;
+  }
+
+  table.table-hover tbody td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-align: left;
+  }
+
+  /* Ajustes específicos para celdas */
+  table.table-hover tbody td:first-child {
+    justify-content: center;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 0.5rem;
+  }
+
+  table.table-hover tbody td:first-child img {
+    width: 100px !important;
+    height: 100px !important;
+  }
+
+  table.table-hover tbody td:last-child {
+    justify-content: center;
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+    margin-top: 0.5rem;
+  }
+
+  .btn-group {
+    width: 100%;
+    display: flex;
+  }
+  
+  .btn-group .btn {
+    flex: 1;
+    padding: 0.75rem;
+  }
+
+  /* Ajustes de Hero para móvil */
+  .hero h2 {
+    font-size: 2.2rem;
+  }
+  
+  .hero p {
+    font-size: 1rem;
+  }
+
+  /* Ajustes de Page Title */
+  .page-title {
+    padding: 4rem 0 2rem;
+  }
+  
+  .page-title h1 {
+    font-size: 1.8rem;
+  }
+}
+
+/* Ajustes para formularios en móvil */
+@media (max-width: 576px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  
+  .d-flex.gap-2 {
+    flex-direction: column;
+  }
 }
