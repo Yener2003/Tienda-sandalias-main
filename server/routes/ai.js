@@ -39,10 +39,14 @@ router.post('/describe', verificarToken, upload.single('imagen'), async (req, re
     const result = await model.generateContent([prompt, imageData]);
     const response = await result.response;
     const text = response.text();
+    console.log('Respuesta de Gemini:', text);
 
-    // Limpiar el texto si Gemini devuelve markdown (```json ...)
-    const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim();
-    const data = JSON.parse(cleanJson);
+    // Limpiar el texto si Gemini devuelve markdown o texto extra
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error('No se encontró un JSON válido en la respuesta de la IA');
+    }
+    const data = JSON.parse(jsonMatch[0]);
 
     res.json(data);
   } catch (error) {
