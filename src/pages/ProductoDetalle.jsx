@@ -6,8 +6,9 @@ import 'swiper/css'
 import 'swiper/css/pagination'
 import Navbar from '../components/Navbar.jsx'
 import Footer from '../components/Footer.jsx'
+import LoadingSpinner from '../components/LoadingSpinner.jsx'
 import { getProducto } from '../services/api'
-import { formatearPrecio, generarMensajeWhatsApp, calcularPrecio } from '../data/productos.js'
+import { formatearPrecio, generarMensajeWhatsApp } from '../data/productos.js'
 
 function ProductoDetalle() {
   const { id } = useParams()
@@ -32,7 +33,13 @@ function ProductoDetalle() {
     }
   }
 
-  if (cargando) return <div className="text-center py-5">Cargando producto...</div>
+  if (cargando) return (
+    <>
+      <Navbar />
+      <LoadingSpinner />
+      <Footer />
+    </>
+  )
 
   if (!producto) {
     return (

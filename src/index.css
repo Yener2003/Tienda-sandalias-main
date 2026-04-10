@@ -1,9 +1,28 @@
 /* ===== Variables y estilos globales para Lia Boutique ===== */
 :root {
   --primary-color: #c9a84c;
-  --dark-bg: #1a1a1a;
-  --text-light: #f5f5f5;
+  --primary-hover: #b8923e;
+  
+  /* Colores Light Mode */
+  --bg-color: #ffffff;
+  --bg-secondary: #f9f9f9;
+  --text-main: #333333;
+  --text-muted: #666666;
+  --text-on-dark: #ffffff;
+  --header-bg: rgba(26, 26, 26, 0.95);
   --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+  --border-color: #eeeeee;
+}
+
+[data-theme='dark'] {
+  --bg-color: #121212;
+  --bg-secondary: #1e1e1e;
+  --text-main: #f5f5f5;
+  --text-muted: #bbbbbb;
+  --text-on-dark: #ffffff;
+  --header-bg: rgba(10, 10, 10, 0.98);
+  --card-shadow: 0 4px 25px rgba(0, 0, 0, 0.6);
+  --border-color: #333333;
 }
 
 * {
@@ -14,8 +33,9 @@
 
 body {
   font-family: "Poppins", sans-serif;
-  background-color: #fff;
-  color: #333;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  transition: background-color 0.3s, color 0.3s;
 }
 
 /* ===== NAVBAR ===== */
@@ -213,7 +233,7 @@ body {
 .section-title h2 {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--dark-bg);
+  color: var(--text-main);
 }
 
 .section-title h2::after {
@@ -227,7 +247,7 @@ body {
 }
 
 .section-title p {
-  color: #888;
+  color: var(--text-muted);
   font-size: 1rem;
 }
 
@@ -281,12 +301,13 @@ body {
 .producto-card .card-body {
   padding: 1.1rem;
   text-align: center;
+  background-color: var(--bg-color);
 }
 
 .producto-card h5 {
   font-weight: 600;
   font-size: 1rem;
-  color: #333;
+  color: var(--text-main);
   margin: 0;
 }
 
@@ -366,14 +387,14 @@ body {
 }
 
 .portfolio-info {
-  background: #f9f9f9;
+  background: var(--bg-secondary);
   border-radius: 16px;
   padding: 2rem;
   box-shadow: var(--card-shadow);
 }
 
 .portfolio-info h3 {
-  color: var(--dark-bg);
+  color: var(--text-main);
   font-size: 1.4rem;
   font-weight: 700;
   margin-bottom: 1.2rem;
@@ -389,9 +410,9 @@ body {
 
 .portfolio-info li {
   padding: 0.6rem 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-color);
   font-size: 0.95rem;
-  color: #555;
+  color: var(--text-muted);
 }
 
 .portfolio-info li:last-child {
@@ -399,7 +420,7 @@ body {
 }
 
 .portfolio-info strong {
-  color: #333;
+  color: var(--text-main);
 }
 
 /* Swiper custom */
@@ -564,6 +585,100 @@ body {
   animation: fadeInUp 0.6s ease forwards;
 }
 
+
 .producto-item {
   animation: fadeInUp 0.5s ease forwards;
+}
+
+/* ===== SPINNER PREMIUM ===== */
+.premium-spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 0;
+  min-height: 200px;
+}
+
+.premium-spinner {
+  width: 60px;
+  height: 60px;
+  border: 3px solid rgba(201, 168, 76, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+  animation: spin-premium 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+  position: relative;
+}
+
+.premium-spinner::after {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  border: 2px solid rgba(201, 168, 76, 0.05);
+  border-radius: 50%;
+  border-left-color: var(--primary-color);
+  border-right-color: var(--primary-color);
+  animation: spin-premium-reverse 2s linear infinite;
+}
+
+@keyframes spin-premium {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spin-premium-reverse {
+  to { transform: rotate(-360deg); }
+}
+
+.loading-text {
+  margin-top: 1.5rem;
+  color: var(--primary-color);
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  animation: pulse-text 1.5s alternate infinite;
+}
+
+@keyframes pulse-text {
+  from { opacity: 0.5; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ===== THEME TOGGLE ===== */
+.theme-toggle-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-left: 1rem;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  transform: rotate(15deg) scale(1.1);
+}
+
+[data-theme='dark'] .header {
+  background: var(--header-bg);
+}
+
+[data-theme='dark'] .card {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+[data-theme='dark'] .producto-card {
+  background-color: var(--bg-secondary);
 }

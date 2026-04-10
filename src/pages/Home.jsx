@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar.jsx'
 import Footer from '../components/Footer.jsx'
+import LoadingSpinner from '../components/LoadingSpinner.jsx'
 import { getProductos } from '../services/api'
 
 const ITEMS_PER_PAGE = 10
@@ -112,7 +113,11 @@ function Home() {
             <p>Productos</p>
           </div>
 
-          {/* Filtros */}
+          {cargando ? (
+            <LoadingSpinner />
+          ) : (
+            <>
+              {/* Filtros */}
           <div className="text-center mb-4">
             <button
               className={`filter-btn btn ${filtro === 'todos' ? 'active' : ''}`}
@@ -156,6 +161,8 @@ function Home() {
                 Ver más productos
               </button>
             </div>
+          )}
+            </>
           )}
         </div>
       </main>

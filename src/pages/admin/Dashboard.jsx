@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import { getProductosAdmin, eliminarProducto } from '../../services/api'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
+import LoadingSpinner from '../../components/LoadingSpinner'
 
 function Dashboard() {
   const [productos, setProductos] = useState([])
@@ -41,7 +42,13 @@ function Dashboard() {
     }
   }
 
-  if (cargando) return <div className="text-center py-5">Cargando dashboard...</div>
+  if (cargando) return (
+    <>
+      <Navbar />
+      <LoadingSpinner />
+      <Footer />
+    </>
+  )
 
   return (
     <>
