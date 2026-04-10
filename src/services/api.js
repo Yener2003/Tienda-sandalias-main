@@ -26,6 +26,18 @@ export async function getProducto(id) {
   return data.producto
 }
 
+// ── IA - Gemini ──
+export async function describirImagenIA(formData) {
+  const res = await fetch(`${API_URL}/api/ai/describe`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: formData,
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || 'Error al describir la imagen')
+  return data
+}
+
 // ── Admin: todos los productos ──
 export async function getProductosAdmin() {
   const res = await fetch(`${API_URL}/api/productos/admin`, {

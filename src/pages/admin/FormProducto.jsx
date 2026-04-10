@@ -105,6 +105,31 @@ function FormProducto() {
     }
   }
 
+  const handleGenerarIA = async () => {
+    if (!imagenPrincipal) {
+      alert('Primero selecciona la Imagen Principal para analizar')
+      return
+    }
+
+    setCargando(true)
+    setError('')
+    try {
+      const formDataIA = new FormData()
+      formDataIA.append('imagen', imagenPrincipal)
+      const data = await import('../../services/api').then(m => m.describirImagenIA(formDataIA))
+      setFormData(prev => ({
+        ...prev,
+        nombre: data.nombre,
+        descripcion: data.descripcion
+      }))
+    } catch (err) {
+      console.error(err)
+      setError('Error al generar con IA. Verifica tu GEMINI_API_KEY en Railway.')
+    } finally {
+      setCargando(false)
+    }
+  }
+
   return (
     <>
       <Navbar />
@@ -161,6 +186,19 @@ function FormProducto() {
                   <label className="form-label">Imagen Principal</label>
                   <input type="file" className="form-control" name="imagen_principal" onChange={handleFileChange} />
                   {previewPrincipal && <img src={previewPrincipal} alt="Preview" className="mt-2" style={{ width: '100px', borderRadius: '8px' }} />}
+                  
+                  {/* Botón de IA */}
+                  {!esEdicion && (
+                    <button
+                      type="button"
+                      className="btn btn-outline-primary btn-sm mt-2 w-100"
+                      onClick={handleGenerarIA}
+                      disabled={cargando || !imagenPrincipal}
+                      style={{ borderStyle: 'dashed', color: '#c9a84c', borderColor: '#c9a84c' }}
+                    >
+                      {cargando ? 'Analizando...' : '✨ Autocompletar con IA'}
+                    </button>
+                  )}
                 </div>
 
                 <div className="col-md-6">

@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { initDB } from './db.js';
 import authRoutes from './routes/auth.js';
 import productosRoutes from './routes/productos.js';
+import aiRoutes from './routes/ai.js';
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 // ── Rutas ──
 app.use('/api/auth', authRoutes);
 app.use('/api/productos', productosRoutes);
+app.use('/api/ai', aiRoutes);
 
 // ── Health check ──
 app.get('/api/health', (req, res) => {
