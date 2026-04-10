@@ -124,7 +124,9 @@ function FormProducto() {
       }))
     } catch (err) {
       console.error(err)
-      setError(err.message || 'Error al generar con IA. Verifica tu GEMINI_API_KEY en Railway.')
+      // Priorizar el mensaje amigable del servidor si existe
+      const msg = err.response?.data?.error || err.message || 'Error al generar con IA'
+      setError(msg)
     } finally {
       setCargando(false)
     }

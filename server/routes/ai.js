@@ -51,7 +51,32 @@ router.post('/describe', verificarToken, upload.single('imagen'), async (req, re
     res.json(data);
   } catch (error) {
     console.error('Error con Gemini AI:', error);
-    res.status(500).json({ error: `Error de IA: ${error.message}` });
+    
+    // Extraer mensaje y código de error
+    const msg = error.message || '';
+    
+    // Traducción de errores técnicos a mensajes amigables para Lia Boutique
+    if (msg.includes('503') || msg.includes('Service Unavailable') || msg.includes('demand')) {
+      return res.status(503).json({ 
+        error: 'Los servidores de Google están un poco saturados. Por favor, espera 15 segundos e intenta de nuevo. ✨' 
+      });
+    }
+
+    if (msg.includes('429') || msg.includes('Too Many Requests') || msg.includes('limit')) {
+      return res.status(429).json({ 
+        error: 'Estamos procesando muchas peticiones. Por favor, intenta de nuevo en un minuto.' 
+      });
+    }
+
+    if (msg.includes('API key')) {
+      return res.status(403).json({ 
+        error: 'Hay un problema con la llave de acceso a la IA. Contacta a soporte o revisa tus variables en Railway.' 
+      });
+    }
+
+    res.status(500).json({ 
+      error: 'La IA tuvo un pequeño tropiezo técnico. Por favor, intenta subir la imagen de nuevo.' 
+    });
   }
 });
 
