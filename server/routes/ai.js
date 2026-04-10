@@ -1,6 +1,6 @@
 import express from 'express';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { protect } from '../middleware/auth.js';
+import { verificarToken } from '../middleware/auth.js';
 import multer from 'multer';
 
 const router = express.Router();
@@ -9,7 +9,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 // Configuración de Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-router.post('/describe', protect, upload.single('imagen'), async (req, res) => {
+router.post('/describe', verificarToken, upload.single('imagen'), async (req, res) => {
   try {
     if (!process.env.GEMINI_API_KEY) {
       return res.status(500).json({ error: 'Configuración de IA faltante (GEMINI_API_KEY)' });
