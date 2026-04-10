@@ -2,14 +2,31 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar.jsx'
 import Footer from '../components/Footer.jsx'
-import productos from '../data/productos.js'
+import { getProductos } from '../services/api'
 
 const ITEMS_PER_PAGE = 10
 
 function Home() {
+  const [productos, setProductos] = useState([])
   const [filtro, setFiltro] = useState('todos')
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE)
   const [scrollTop, setScrollTop] = useState(false)
+  const [cargando, setCargando] = useState(true)
+
+  useEffect(() => {
+    cargarProductos()
+  }, [])
+
+  const cargarProductos = async () => {
+    try {
+      const data = await getProductos()
+      setProductos(data)
+    } catch (err) {
+      console.error('Error cargando productos:', err)
+    } finally {
+      setCargando(false)
+    }
+  }
 
   // Filtrar productos
   const productosFiltrados = filtro === 'todos'
@@ -118,7 +135,7 @@ function Home() {
                 <Link to={`/producto/${producto.id}`} className="producto-card">
                   <div className="card h-100">
                     <img
-                      src={producto.imagenPrincipal}
+                      src={producto.imagen_principal}
                       className="card-img-top"
                       alt={producto.nombre}
                       onError={(e) => { e.target.style.background = '#f0f0f0'; e.target.style.minHeight = '200px' }}

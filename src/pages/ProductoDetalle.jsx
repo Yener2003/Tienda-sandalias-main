@@ -6,18 +6,33 @@ import 'swiper/css'
 import 'swiper/css/pagination'
 import Navbar from '../components/Navbar.jsx'
 import Footer from '../components/Footer.jsx'
-import productos, { calcularPrecio, formatearPrecio, generarMensajeWhatsApp } from '../data/productos.js'
+import { getProducto } from '../services/api'
+import { formatearPrecio, generarMensajeWhatsApp, calcularPrecio } from '../data/productos.js'
 
 function ProductoDetalle() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const [producto, setProducto] = useState(null)
+  const [cargando, setCargando] = useState(true)
 
-  const producto = productos.find(p => p.id === parseInt(id))
-
-  // Scroll al top cuando carga el detalle
+  // Scroll al top y cargar producto
   useEffect(() => {
     window.scrollTo(0, 0)
+    cargarProducto()
   }, [id])
+
+  const cargarProducto = async () => {
+    try {
+      const p = await getProducto(id)
+      setProducto(p)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setCargando(false)
+    }
+  }
+
+  if (cargando) return <div className="text-center py-5">Cargando producto...</div>
 
   if (!producto) {
     return (
@@ -28,9 +43,20 @@ function ProductoDetalle() {
     )
   }
 
-  const precio = formatearPrecio(calcularPrecio(producto.tipoSuela))
-  const mensaje = generarMensajeWhatsApp(producto)
+  // Mapear campos del backend a los esperados por el helper (si es necesario)
+  const productoParaWhatsApp = {
+    ...producto,
+    tipoSuela: producto.tipo_suela, // El helper usa camelCase en el código original de productos.js
+  }
+
+  const precio = formatearPrecio(producto.precio)
+  const mensaje = generarMensajeWhatsApp(productoParaWhatsApp)
   const whatsappUrl = `https://wa.me/+573157832101?text=${encodeURIComponent(mensaje)}`
+
+  // Las imágenes del carrusel vienen como JSON string o array dependiendo del driver de pg
+  const carrusel = Array.isArray(producto.imagenes_carrusel) 
+    ? producto.imagenes_carrusel 
+    : JSON.parse(producto.imagenes_carrusel || '[]')
 
   return (
     <>
@@ -72,14 +98,14 @@ function ProductoDetalle() {
                   speed={600}
                   style={{ borderRadius: '16px', overflow: 'hidden' }}
                 >
-                  {producto.imagenesCarrusel.map((img, index) => (
+                  {carrusel.map((img, index) => (
                     <SwiperSlide key={index}>
                       <img
                         src={img}
                         alt={`${producto.nombre} - imagen ${index + 1}`}
                         style={{ width: '100%', maxHeight: '480px', objectFit: 'cover' }}
                         onError={(e) => {
-                          e.target.src = producto.imagenPrincipal
+                          e.target.src = producto.imagen_principal
                         }}
                       />
                     </SwiperSlide>
@@ -103,7 +129,7 @@ function ProductoDetalle() {
                     <li><strong>Tallas</strong>: {producto.tallas}</li>
                     <li>
                       <strong>Tipo de suela</strong>:{' '}
-                      {producto.tipoSuela === 'alta' ? 'Alta' : 'Baja'}
+                      {producto.tipo_suela === 'alta' ? 'Alta' : 'Baja'}
                     </li>
                   </ul>
                 </div>
