@@ -19,7 +19,7 @@ router.post('/describe', verificarToken, upload.single('imagen'), async (req, re
       return res.status(400).json({ error: 'Debes subir una imagen para analizar' });
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-pro-latest' });
 
     // Preparar la imagen para Gemini
     const imageData = {
@@ -51,7 +51,7 @@ router.post('/describe', verificarToken, upload.single('imagen'), async (req, re
     res.json(data);
   } catch (error) {
     console.error('Error con Gemini AI:', error);
-    res.status(500).json({ error: 'Error al procesar la imagen con IA' });
+    res.status(500).json({ error: `Error de IA: ${error.message}` });
   }
 });
 
