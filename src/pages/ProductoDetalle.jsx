@@ -119,8 +119,7 @@ function ProductoDetalle() {
                               width: '100%', 
                               minHeight: '400px', 
                               maxHeight: '600px', 
-                              objectFit: 'contain',
-                              padding: '2rem' /* Padding para que no toque los bordes del blob */
+                              objectFit: 'cover' /* Ahora la foto toma la forma de la mancha */
                             }}
                             onError={(e) => {
                               e.target.src = producto.imagen_principal

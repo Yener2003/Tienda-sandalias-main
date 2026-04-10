@@ -452,7 +452,7 @@ body {
 .swiper-container-wrapper {
   position: relative;
   z-index: 1;
-  padding: 2rem; /* Espacio para la 'mancha' */
+  padding: 0; /* Eliminado para que la imagen llegue al borde de la mancha */
 }
 
 /* El marco de la mancha */
