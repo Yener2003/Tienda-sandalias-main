@@ -19,7 +19,7 @@ router.post('/describe', verificarToken, upload.single('imagen'), async (req, re
       return res.status(400).json({ error: 'Debes subir una imagen para analizar' });
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
     // Preparar la imagen para Gemini
     const imageData = {
