@@ -16,7 +16,9 @@ const storage = new CloudinaryStorage({
   params: {
     folder: 'lia-boutique',
     allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-    transformation: [{ width: 800, height: 800, crop: 'limit', quality: 'auto' }],
+    transformation: [
+      { width: 1200, height: 1200, crop: 'limit', quality: 'auto', fetch_format: 'auto', dpr: 'auto' }
+    ],
   },
 });
 

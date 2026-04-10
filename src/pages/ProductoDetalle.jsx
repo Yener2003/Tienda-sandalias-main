@@ -110,7 +110,7 @@ function ProductoDetalle() {
                       <img
                         src={img}
                         alt={`${producto.nombre} - imagen ${index + 1}`}
-                        style={{ width: '100%', maxHeight: '480px', objectFit: 'cover' }}
+                        style={{ width: '100%', maxHeight: '480px', objectFit: 'contain', backgroundColor: 'var(--bg-secondary)' }}
                         onError={(e) => {
                           e.target.src = producto.imagen_principal
                         }}
