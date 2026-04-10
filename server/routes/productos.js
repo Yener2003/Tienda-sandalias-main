@@ -46,7 +46,7 @@ router.get('/admin', verificarToken, async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const { rows } = await pool.query(
-      'SELECT * FROM productos WHERE id = $1 AND activo = true',
+      'SELECT * FROM productos WHERE id = $1', // Eliminado AND activo=true para permitir edición admin
       [req.params.id]
     );
     if (rows.length === 0) {
@@ -211,17 +211,49 @@ router.put(
 router.delete('/:id', verificarToken, async (req, res) => {
   try {
     const { id } = req.params;
-
-    const { rows } = await pool.query(
-      'DELETE FROM productos WHERE id = $1 RETURNING *',
-      [id]
-    );
-
-    if (rows.length === 0) {
+    // 1. Obtener datos del producto antes de borrar
+    const { rows: findRows } = await pool.query('SELECT imagen_principal, imagenes_carrusel FROM productos WHERE id = $1', [id]);
+    
+    if (findRows.length === 0) {
       return res.status(404).json({ error: 'Producto no encontrado' });
     }
 
-    res.json({ mensaje: '✅ Producto eliminado' });
+    const { imagen_principal, imagenes_carrusel } = findRows[0];
+
+    // Función auxiliar para extraer public_id y borrar de Cloudinary
+    const borrarDeCloudinary = async (url) => {
+      if (!url) return;
+      try {
+        // Formato: .../v12345/lia-boutique/nombre.jpg -> public_id: lia-boutique/nombre
+        const parts = url.split('/');
+        const fileNameWithExt = parts.pop();
+        const folder = parts.pop(); // 'lia-boutique'
+        const publicId = `${folder}/${fileNameWithExt.split('.')[0]}`;
+        console.log('Borrando de Cloudinary:', publicId);
+        await cloudinary.uploader.destroy(publicId);
+      } catch (err) {
+        console.error('Error borrando imagen de Cloudinary:', err);
+      }
+    };
+
+    // 2. Borrar imagen principal
+    await borrarDeCloudinary(imagen_principal);
+
+    // 3. Borrar imágenes del carrusel (el carrusel suele ser un string JSON o array)
+    const carruselArray = Array.isArray(imagenes_carrusel) 
+      ? imagenes_carrusel 
+      : JSON.parse(imagenes_carrusel || '[]');
+    
+    for (const imgUrl of carruselArray) {
+      if (imgUrl !== imagen_principal) { // Evitar doble borrado si la principal está en el carrusel
+        await borrarDeCloudinary(imgUrl);
+      }
+    }
+
+    // 4. Finalmente borrar de la base de datos
+    await pool.query('DELETE FROM productos WHERE id = $1', [id]);
+
+    res.json({ mensaje: '✅ Producto e imágenes eliminados con éxito' });
   } catch (error) {
     console.error('Error eliminando producto:', error);
     res.status(500).json({ error: 'Error interno del servidor' });
