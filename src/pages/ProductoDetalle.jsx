@@ -98,26 +98,38 @@ function ProductoDetalle() {
               {/* Carrusel */}
               <div className="col-lg-7 fade-in-up">
                 <div className="swiper-container-wrapper">
-                  <Swiper
-                    modules={[Pagination, Autoplay]}
-                    pagination={{ clickable: true }}
-                    autoplay={{ delay: 5000 }}
-                    loop={true}
-                    speed={800}
-                  >
-                    {carrusel.map((img, index) => (
-                      <SwiperSlide key={index}>
-                        <img
-                          src={img}
-                          alt={`${producto.nombre} - imagen ${index + 1}`}
-                          style={{ width: '100%', minHeight: '400px', maxHeight: '600px', objectFit: 'contain' }}
-                          onError={(e) => {
-                            e.target.src = producto.imagen_principal
-                          }}
-                        />
-                      </SwiperSlide>
-                    ))}
-                  </Swiper>
+                  {/* Mancha decorativa detrás */}
+                  <div className="blob-decoration"></div>
+                  
+                  {/* Marco orgánico del carrusel */}
+                  <div className="blob-frame">
+                    <Swiper
+                      modules={[Pagination, Autoplay]}
+                      pagination={{ clickable: true }}
+                      autoplay={{ delay: 5000 }}
+                      loop={true}
+                      speed={1000}
+                    >
+                      {carrusel.map((img, index) => (
+                        <SwiperSlide key={index}>
+                          <img
+                            src={img}
+                            alt={`${producto.nombre} - imagen ${index + 1}`}
+                            style={{ 
+                              width: '100%', 
+                              minHeight: '400px', 
+                              maxHeight: '600px', 
+                              objectFit: 'contain',
+                              padding: '2rem' /* Padding para que no toque los bordes del blob */
+                            }}
+                            onError={(e) => {
+                              e.target.src = producto.imagen_principal
+                            }}
+                          />
+                        </SwiperSlide>
+                      ))}
+                    </Swiper>
+                  </div>
                 </div>
               </div>
 

@@ -448,12 +448,55 @@ body {
   font-size: 1.1rem;
 }
 
-/* Carrusel Detalle */
+/* Carrusel Detalle con Forma Orgánica (Blob) */
 .swiper-container-wrapper {
-  border-radius: 32px; /* Ultra redondeado */
+  position: relative;
+  z-index: 1;
+  padding: 2rem; /* Espacio para la 'mancha' */
+}
+
+/* El marco de la mancha */
+.blob-frame {
+  border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
   overflow: hidden;
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
   background: var(--bg-secondary);
+  transition: all 1s ease-in-out;
+  animation: morph-blob 8s ease-in-out infinite alternate;
+  position: relative;
+  z-index: 2;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Mancha decorativa detrás de la imagen */
+.blob-decoration {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 110%;
+  height: 110%;
+  background: radial-gradient(circle, var(--primary-color) 0%, transparent 70%);
+  opacity: 0.15;
+  filter: blur(40px);
+  z-index: 0;
+  border-radius: 40% 60% 60% 40% / 60% 40% 60% 40%;
+  animation: rotate-blob 15s linear infinite;
+}
+
+[data-theme='dark'] .blob-decoration {
+  opacity: 0.25;
+}
+
+@keyframes morph-blob {
+  0% { border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%; }
+  50% { border-radius: 70% 30% 46% 54% / 30% 59% 41% 70%; }
+  100% { border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%; }
+}
+
+@keyframes rotate-blob {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
 /* Swiper custom */
