@@ -136,17 +136,25 @@ function Home() {
           {/* Grid de productos */}
           <div className="row" id="productGallery">
             {productosVisibles.map((producto) => (
-              <div key={producto.id} className="col-md-4 mb-4 producto-item">
+              <div key={producto.id} className="col-md-4 mb-4 producto-item" data-aos="fade-up">
                 <Link to={`/producto/${producto.id}`} className="producto-card">
                   <div className="card h-100">
-                    <img
-                      src={producto.imagen_principal}
-                      className="card-img-top"
-                      alt={producto.nombre}
-                      onError={(e) => { e.target.style.background = '#f0f0f0'; e.target.style.minHeight = '200px' }}
-                    />
-                    <div className="card-body text-center">
+                    <div className="blob-card-wrapper">
+                      <div className="blob-card-bg"></div>
+                      <img
+                        src={producto.imagen_principal}
+                        className="blob-card-img"
+                        alt={producto.nombre}
+                        onError={(e) => { 
+                          e.target.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                    <div className="card-body">
                       <h5 className="card-title">{producto.nombre}</h5>
+                      <p className="card-text text-muted" style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
+                        {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(producto.precio)}
+                      </p>
                     </div>
                   </div>
                 </Link>

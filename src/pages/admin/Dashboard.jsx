@@ -82,26 +82,29 @@ function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {productos.map(p => (
-                <tr key={p.id}>
+               {productos.map(p => (
+                <tr key={p.id} style={!p.activo ? { opacity: 0.6, background: '#fcfcfc' } : {}}>
                   <td data-label="Imagen">
-                    <img src={p.imagen_principal} alt={p.nombre} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }} />
+                    <img src={p.imagen_principal} alt={p.nombre} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #eee' }} />
                   </td>
-                  <td data-label="Nombre">{p.nombre}</td>
+                  <td data-label="Nombre">
+                    <div className="fw-bold">{p.nombre}</div>
+                    {!p.activo && <span className="badge bg-secondary ms-1" style={{ fontSize: '0.65rem' }}>Oculto</span>}
+                  </td>
                   <td data-label="Precio">{new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(p.precio)}</td>
                   <td data-label="Suela">{p.tipo_suela === 'alta' ? 'Alta' : 'Baja'}</td>
                   <td data-label="Estado">
-                    <span className={`badge ${p.activo ? 'bg-success' : 'bg-secondary'}`}>
+                    <span className={`badge ${p.activo ? 'bg-success' : 'bg-secondary'}`} style={{ borderRadius: '20px', padding: '0.4rem 0.8rem' }}>
                       {p.activo ? 'Activo' : 'Inactivo'}
                     </span>
                   </td>
                   <td data-label="Acciones">
                     <div className="btn-group">
-                      <Link to={`/admin/producto/${p.id}/editar`} className="btn btn-sm btn-outline-primary">
-                        <i className="bi bi-pencil"></i> Editar
+                      <Link to={`/admin/producto/${p.id}/editar`} className="btn btn-sm btn-outline-primary" title="Editar">
+                        <i className="bi bi-pencil"></i>
                       </Link>
-                      <button onClick={() => handleEliminar(p.id)} className="btn btn-sm btn-outline-danger">
-                        <i className="bi bi-trash"></i> Borrar
+                      <button onClick={() => handleEliminar(p.id)} className="btn btn-sm btn-outline-danger" title="Borrar">
+                        <i className="bi bi-trash"></i>
                       </button>
                     </div>
                   </td>

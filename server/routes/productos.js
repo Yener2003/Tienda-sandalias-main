@@ -168,7 +168,21 @@ router.put(
 
       // Imágenes carrusel: nuevas o conservar las actuales
       let imagenes_carrusel = actual.imagenes_carrusel || [];
+      if (typeof imagenes_carrusel === 'string') {
+        imagenes_carrusel = JSON.parse(imagenes_carrusel);
+      }
+
       if (req.files?.imagenes_carrusel?.length > 0) {
+        // 1. Identificar imágenes viejas del carrusel para borrar (excepto la principal si se mantiene)
+        const viejasABorrar = imagenes_carrusel.filter(img => img !== imagen_principal);
+        
+        // 2. Borrar de Cloudinary
+        for (const url of viejasABorrar) {
+          const publicId = url.split('/').pop().split('.')[0];
+          await cloudinary.uploader.destroy(`lia-boutique/${publicId}`).catch(() => {});
+        }
+
+        // 3. Asignar nuevas imágenes
         imagenes_carrusel = req.files.imagenes_carrusel.map(f => f.path);
         if (imagen_principal && !imagenes_carrusel.includes(imagen_principal)) {
           imagenes_carrusel.unshift(imagen_principal);
