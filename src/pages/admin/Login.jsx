@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
+import toast from 'react-hot-toast'
 
 function Login() {
   const [email, setEmail] = useState('')
@@ -27,9 +28,10 @@ function Login() {
 
     try {
       await login(email, password)
+      toast.success('¡Bienvenido de nuevo!')
       navigate('/admin/dashboard')
     } catch (err) {
-      setError(err.message || 'Error al iniciar sesión')
+      toast.error(err.message || 'Error al iniciar sesión')
     } finally {
       setCargando(false)
     }
@@ -42,7 +44,6 @@ function Login() {
         <div className="page-title" style={{ background: 'var(--bg-color)' }}>
           <div className="container admin-card" style={{ maxWidth: '400px', margin: '4rem auto' }}>
             <h2 className="text-center mb-4">Admin Login</h2>
-            {error && <div className="alert alert-danger">{error}</div>}
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
                 <label className="form-label">Email</label>

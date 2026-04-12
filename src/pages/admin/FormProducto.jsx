@@ -4,6 +4,8 @@ import { useAuth } from '../../context/AuthContext'
 import { crearProducto, editarProducto, getProducto, describirImagenIA } from '../../services/api'
 import AdminLayout from '../../components/AdminLayout'
 import LoadingSpinner from '../../components/LoadingSpinner'
+import toast from 'react-hot-toast'
+import Swal from 'sweetalert2'
 
 function FormProducto() {
   const { id } = useParams()
@@ -49,7 +51,7 @@ function FormProducto() {
       })
       setPreviewPrincipal(p.imagen_principal)
     } catch (err) {
-      setError('Error al cargar producto')
+      toast.error('Error al cargar producto')
     }
   }
 
@@ -90,12 +92,14 @@ function FormProducto() {
     try {
       if (esEdicion) {
         await editarProducto(id, data)
+        toast.success('Producto actualizado')
       } else {
         await crearProducto(data)
+        toast.success('Producto creado exitosamente')
       }
-      navigate('/admin/dashboard')
+      navigate('/admin/productos')
     } catch (err) {
-      setError(err.message || 'Error al guardar producto')
+      toast.error(err.message || 'Error al guardar producto')
     } finally {
       setCargando(false)
     }
@@ -103,7 +107,7 @@ function FormProducto() {
 
   const handleGenerarIA = async () => {
     if (!imagenPrincipal) {
-      alert('Primero selecciona la Imagen Principal para analizar')
+      toast.error('Primero selecciona la Imagen Principal')
       return
     }
 
@@ -134,8 +138,6 @@ function FormProducto() {
           <div className="col-lg-8 admin-card">
             <h2 className="mb-4">{esEdicion ? 'Editar Producto' : 'Nuevo Producto'}</h2>
             
-            {error && <div className="alert alert-danger">{error}</div>}
-
             <form onSubmit={handleSubmit}>
               <div className="row gy-3">
                 <div className="col-md-8">

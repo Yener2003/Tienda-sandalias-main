@@ -4,6 +4,8 @@ import { useAuth } from '../../context/AuthContext'
 import { getClientes, getProductosAdmin, crearVenta } from '../../services/api'
 import AdminLayout from '../../components/AdminLayout'
 import ReceiptModal from '../../components/ReceiptModal'
+import toast from 'react-hot-toast'
+import Swal from 'sweetalert2'
 
 function NuevaVenta() {
   const { usuario } = useAuth()
@@ -84,8 +86,9 @@ function NuevaVenta() {
     try { 
       const res = await crearVenta(payload)
       setVentaCreada(res.venta)
+      toast.success('Venta guardada exitosamente')
     }
-    catch (err) { setError(err.message) }
+    catch (err) { toast.error(err.message) }
     setGuardando(false)
   }
 

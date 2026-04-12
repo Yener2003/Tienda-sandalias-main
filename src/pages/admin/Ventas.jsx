@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { getVentas, cambiarEstadoVenta, cambiarEstadoPagoVenta, eliminarVenta, registrarPagoVenta } from '../../services/api'
+import toast from 'react-hot-toast'
+import Swal from 'sweetalert2'
 
 import AdminLayout from '../../components/AdminLayout'
 import LoadingSpinner from '../../components/LoadingSpinner'
@@ -59,17 +61,19 @@ function Ventas() {
     try {
       await cambiarEstadoVenta(id, estado)
       setVentas(ventas.map(v => v.id === id ? { ...v, estado } : v))
-    } catch (err) { alert(err.message) }
+      toast.success('Estado de entrega actualizado')
+    } catch (err) { toast.error(err.message) }
   }
 
   const cambiarPago = async (id, estado_pago) => {
     try {
       await cambiarEstadoPagoVenta(id, estado_pago)
       setVentas(ventas.map(v => v.id === id ? { ...v, estado_pago } : v))
-    } catch (err) { alert(err.message) }
+      toast.success('Estado de pago actualizado')
+    } catch (err) { toast.error(err.message) }
   }
   const confirmarPago = async () => {
-    if (montoPago <= 0) return alert('Ingrese un monto válido')
+    if (montoPago <= 0) return toast.error('Ingrese un monto válido')
     setProcesandoPago(true)
     try {
       const saldoRestante = ventaPago.total - (ventaPago.abono_inicial || 0)
@@ -83,7 +87,8 @@ function Ventas() {
       
       setVentas(ventas.map(v => v.id === ventaPago.id ? { ...v, ...ventaAct } : v))
       setVentaPago(null)
-    } catch (err) { alert(err.message) }
+      toast.success('Pago registrado correctamente')
+    } catch (err) { toast.error(err.message) }
     setProcesandoPago(false)
   }
 
@@ -96,9 +101,26 @@ function Ventas() {
   }
 
   const borrar = async (id) => {
-    if (!window.confirm('¿Eliminar esta venta?')) return
-    try { await eliminarVenta(id); setVentas(ventas.filter(v => v.id !== id)) }
-    catch (err) { alert(err.message) }
+    const result = await Swal.fire({
+      title: '¿Estás seguro?',
+      text: "Esta acción no se puede deshacer",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#e63946',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      background: 'var(--bg-secondary)',
+      color: 'var(--text-main)'
+    })
+
+    if (result.isConfirmed) {
+      try { 
+        await eliminarVenta(id)
+        setVentas(ventas.filter(v => v.id !== id))
+        toast.success('Venta eliminada')
+      } catch (err) { toast.error(err.message) }
+    }
   }
 
 

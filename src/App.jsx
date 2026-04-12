@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
+import { Toaster } from 'react-hot-toast'
 import Home from './pages/Home.jsx'
 import Nosotros from './pages/Nosotros.jsx'
 import Historia from './pages/Historia.jsx'
@@ -16,6 +17,7 @@ import ProductosAdmin from './pages/admin/ProductosAdmin.jsx'
 function App() {
   return (
     <AuthProvider>
+      <Toaster position="top-center" reverseOrder={false} />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />

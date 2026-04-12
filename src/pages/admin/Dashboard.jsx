@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import { getProductosAdmin, getVentas, getClientes } from '../../services/api'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import AdminLayout from '../../components/AdminLayout'
+import toast from 'react-hot-toast'
 
 function Dashboard() {
   const [stats, setStats] = useState({ products: 0, sales: 0, clients: 0, revenue: 0 })
@@ -31,6 +32,7 @@ function Dashboard() {
         pending: totalPending
       })
     } catch (err) {
+      toast.error('Error cargando datos del dashboard')
       console.error(err)
     } finally {
       setCargando(false)
@@ -56,7 +58,6 @@ function Dashboard() {
             <p style={{ color: 'var(--text-muted)', margin: 0 }}>Bienvenido, <strong>{usuario?.nombre}</strong>. Aquí tienes el resumen de hoy.</p>
           </div>
           <div className="d-flex gap-2">
-             <Link to="/" className="btn btn-outline-secondary btn-sm d-none d-md-block">Ir a la Web</Link>
              <button onClick={logout} className="btn btn-outline-danger btn-sm d-md-none">Cerrar Sesión</button>
           </div>
         </div>

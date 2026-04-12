@@ -4,6 +4,8 @@ import { useAuth } from '../../context/AuthContext'
 import { getClientes, crearCliente, editarCliente, eliminarCliente } from '../../services/api'
 import AdminLayout from '../../components/AdminLayout'
 import LoadingSpinner from '../../components/LoadingSpinner'
+import toast from 'react-hot-toast'
+import Swal from 'sweetalert2'
 
 const EMPTY = { nombre: '', telefono: '', email: '', direccion: '' }
 
@@ -36,7 +38,7 @@ function Clientes() {
   }, [location.search])
 
   const cargar = async () => {
-    try { setClientes(await getClientes()) } catch { setError('Error cargando clientes') }
+    try { setClientes(await getClientes()) } catch { toast.error('Error cargando clientes') }
     finally { setCargando(false) }
   }
 
@@ -52,19 +54,38 @@ function Clientes() {
       if (editando) {
         const updated = await editarCliente(editando.id, form)
         setClientes(clientes.map(c => c.id === editando.id ? updated : c))
+        toast.success('Cliente actualizado')
       } else {
         const nuevo = await crearCliente(form)
         setClientes([nuevo, ...clientes])
+        toast.success('Cliente creado')
       }
       cerrar()
-    } catch (err) { setError(err.message) }
+    } catch (err) { toast.error(err.message) }
     setGuardando(false)
   }
 
   const borrar = async (id) => {
-    if (!window.confirm('¿Eliminar este cliente?')) return
-    try { await eliminarCliente(id); setClientes(clientes.filter(c => c.id !== id)) }
-    catch (err) { alert(err.message) }
+    const result = await Swal.fire({
+      title: '¿Eliminar cliente?',
+      text: "Esta acción no se puede deshacer",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#e63946',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      background: 'var(--bg-secondary)',
+      color: 'var(--text-main)'
+    })
+
+    if (result.isConfirmed) {
+      try { 
+        await eliminarCliente(id)
+        setClientes(clientes.filter(c => c.id !== id))
+        toast.success('Cliente eliminado')
+      } catch (err) { toast.error(err.message) }
+    }
   }
 
   if (cargando) return (
@@ -157,7 +178,6 @@ function Clientes() {
                 <h5 style={{ color: 'var(--text-main)', fontWeight: 700, margin: 0 }}>{editando ? 'Editar Cliente' : 'Nuevo Cliente'}</h5>
                 <button onClick={cerrar} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '1.3rem', cursor: 'pointer' }}>✕</button>
               </div>
-              {error && <div className="alert alert-danger py-2 mb-3">{error}</div>}
               <form onSubmit={guardar}>
                 {[
                   { label: 'Nombre *', key: 'nombre', type: 'text', required: true },

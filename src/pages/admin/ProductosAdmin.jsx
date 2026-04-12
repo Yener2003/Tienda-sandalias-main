@@ -4,6 +4,8 @@ import { useAuth } from '../../context/AuthContext'
 import { getProductosAdmin, eliminarProducto } from '../../services/api'
 import AdminLayout from '../../components/AdminLayout'
 import LoadingSpinner from '../../components/LoadingSpinner'
+import toast from 'react-hot-toast'
+import Swal from 'sweetalert2'
 
 function ProductosAdmin() {
   const [productos, setProductos] = useState([])
@@ -30,12 +32,27 @@ function ProductosAdmin() {
   }
 
   const handleEliminar = async (id) => {
-    if (!window.confirm('¿Estás seguro de eliminar este producto?')) return
-    try {
-      await eliminarProducto(id)
-      setProductos(productos.filter(p => p.id !== id))
-    } catch (err) {
-      alert('Error al eliminar: ' + err.message)
+    const result = await Swal.fire({
+      title: '¿Eliminar producto?',
+      text: "Se eliminarán permanentemente los datos",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#e63946',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      background: 'var(--bg-secondary)',
+      color: 'var(--text-main)'
+    })
+
+    if (result.isConfirmed) {
+      try {
+        await eliminarProducto(id)
+        setProductos(productos.filter(p => p.id !== id))
+        toast.success('Producto eliminado')
+      } catch (err) {
+        toast.error('Error: ' + err.message)
+      }
     }
   }
 
@@ -57,7 +74,6 @@ function ProductosAdmin() {
             <Link to="/admin/producto/nuevo" className="btn btn-sm d-none d-md-block" style={{ background: '#2d6a4f', color: '#fff' }}>
               + Nuevo
             </Link>
-            <Link to="/" className="btn btn-outline-secondary btn-sm d-none d-md-block">Ver Tienda</Link>
           </div>
         </div>
 
