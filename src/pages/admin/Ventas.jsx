@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import { getVentas, cambiarEstadoVenta, cambiarEstadoPagoVenta, eliminarVenta, registrarPagoVenta } from '../../services/api'
 import toast from 'react-hot-toast'
 import Swal from 'sweetalert2'
+import { useMemo } from 'react'
 
 import AdminLayout from '../../components/AdminLayout'
 import LoadingSpinner from '../../components/LoadingSpinner'
@@ -45,6 +46,10 @@ function Ventas() {
   const [ventaRecibo, setVentaRecibo] = useState(null)
   const [mostrarRecibo, setMostrarRecibo] = useState(false)
 
+  // Filtros
+  const [filtroPago, setFiltroPago] = useState('todos') // todos, contado, credito
+  const [filtroDeuda, setFiltroDeuda] = useState('todas') // todas, deuda
+
 
   useEffect(() => {
     if (!usuario) { navigate('/admin/login'); return }
@@ -56,6 +61,27 @@ function Ventas() {
     try { setVentas(await getVentas()) } catch (e) { console.error(e) }
     setCargando(false)
   }
+
+  const filteredVentas = useMemo(() => {
+    return ventas.filter(v => {
+      const matchPago = filtroPago === 'todos' || v.tipo_pago === filtroPago
+      const matchDeuda = filtroDeuda === 'todas' || (v.total - (v.abono_inicial || 0) > 0)
+      return matchPago && matchDeuda
+    })
+  }, [ventas, filtroPago, filtroDeuda])
+
+  const statsCalculated = useMemo(() => {
+    const totalVentas = filteredVentas.reduce((acc, v) => acc + v.total, 0)
+    const totalRecaudado = filteredVentas.reduce((acc, v) => acc + (v.abono_inicial || 0), 0)
+    const pendientesEntrega = filteredVentas.filter(v => v.estado === 'pendiente').length
+    return {
+      count: filteredVentas.length,
+      total: totalVentas,
+      recaudado: totalRecaudado,
+      pendiente: Math.max(0, totalVentas - totalRecaudado),
+      entrega: pendientesEntrega
+    }
+  }, [filteredVentas])
 
   const cambiarEstado = async (id, estado) => {
     try {
@@ -124,10 +150,6 @@ function Ventas() {
   }
 
 
-  const totalVentas = ventas.reduce((s, v) => s + v.total, 0)
-  const cobrado = ventas.reduce((s, v) => s + (v.abono_inicial || 0), 0)
-  const porCobrar = Math.max(0, totalVentas - cobrado)
-  const pendientes = ventas.filter(v => v.estado === 'pendiente').length
 
   if (cargando) return (
     <AdminLayout>
@@ -157,10 +179,10 @@ function Ventas() {
         {/* Stats cards */}
         <div className="row g-3 mb-4">
           {[
-            { label: 'Total Ventas', value: formatCOP(totalVentas), icon: 'bi-bag-check', color: 'var(--primary-color)', big: true },
-            { label: 'Cobrado', value: formatCOP(cobrado), icon: 'bi-cash-stack', color: '#2d6a4f', big: true },
-            { label: 'Por Cobrar', value: formatCOP(porCobrar), icon: 'bi-clock-history', color: '#f4a261', big: true },
-            { label: 'Pend. Entrega', value: pendientes, icon: 'bi-truck', color: '#4895ef' },
+            { label: 'Total Ventas', value: formatCOP(statsCalculated.total), icon: 'bi-bag-check', color: 'var(--primary-color)', big: true },
+            { label: 'Cobrado', value: formatCOP(statsCalculated.recaudado), icon: 'bi-cash-stack', color: '#2d6a4f', big: true },
+            { label: 'Por Cobrar', value: formatCOP(statsCalculated.pendiente), icon: 'bi-clock-history', color: '#f4a261', big: true },
+            { label: 'Pend. Entrega', value: statsCalculated.entrega, icon: 'bi-truck', color: '#4895ef' },
           ].map((s, i) => (
             <div key={i} className="col-6 col-lg-3">
               <div className="admin-card stats-card">
@@ -172,18 +194,60 @@ function Ventas() {
           ))}
         </div>
 
+        {/* Filtros */}
+        <div className="admin-card p-3 mb-4">
+          <div className="row g-2">
+            <div className="col-md-5">
+              <div className="d-flex gap-2 flex-wrap">
+                <button 
+                  className={`btn btn-sm rounded-pill px-3 ${filtroPago === 'todos' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                  style={filtroPago === 'todos' ? { background: 'var(--primary-color)', borderColor: 'var(--primary-color)' } : {}}
+                  onClick={() => setFiltroPago('todos')}
+                >Todas</button>
+                <button 
+                  className={`btn btn-sm rounded-pill px-3 ${filtroPago === 'contado' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                  style={filtroPago === 'contado' ? { background: 'var(--primary-color)', borderColor: 'var(--primary-color)' } : {}}
+                  onClick={() => setFiltroPago('contado')}
+                >Contado</button>
+                <button 
+                  className={`btn btn-sm rounded-pill px-3 ${filtroPago === 'credito' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                  style={filtroPago === 'credito' ? { background: 'var(--primary-color)', borderColor: 'var(--primary-color)' } : {}}
+                  onClick={() => setFiltroPago('credito')}
+                >Crédito</button>
+              </div>
+            </div>
+            <div className="col-md-5">
+               <div className="d-flex gap-2">
+                  <button 
+                    className={`btn btn-sm rounded-pill px-3 w-100 ${filtroDeuda === 'todas' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                    style={filtroDeuda === 'todas' ? { background: 'var(--primary-color)', borderColor: 'var(--primary-color)' } : {}}
+                    onClick={() => setFiltroDeuda('todas')}
+                  >Ver Todo</button>
+                  <button 
+                    className={`btn btn-sm rounded-pill px-3 w-100 ${filtroDeuda === 'deuda' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                    style={filtroDeuda === 'deuda' ? { background: 'var(--primary-color)', borderColor: 'var(--primary-color)' } : {}}
+                    onClick={() => setFiltroDeuda('deuda')}
+                  >Solo con Deuda</button>
+               </div>
+            </div>
+            <div className="col-md-2 d-none d-md-block text-end">
+               <button className="btn btn-sm btn-link text-muted" onClick={() => { setFiltroPago('todos'); setFiltroDeuda('todas') }}>Limpiar</button>
+            </div>
+          </div>
+        </div>
+
         {/* Lista */}
         {cargando ? (
           <p className="text-center py-4" style={{ color: 'var(--text-muted)' }}>Cargando ventas...</p>
-        ) : ventas.length === 0 ? (
+        ) : filteredVentas.length === 0 ? (
           <div className="admin-card text-center py-5">
-            <i className="bi bi-bag" style={{ fontSize: '3rem', color: 'var(--text-muted)' }}></i>
-            <p className="mt-2" style={{ color: 'var(--text-muted)' }}>No hay ventas registradas aún.</p>
-            <Link to="/admin/ventas/nueva" className="btn btn-sm" style={{ background: '#2d6a4f', color: '#fff' }}>+ Registrar primera venta</Link>
+            <i className="bi bi-search" style={{ fontSize: '3rem', color: 'var(--text-muted)', opacity: 0.3 }}></i>
+            <p className="mt-2" style={{ color: 'var(--text-muted)' }}>No se encontraron ventas con estos filtros.</p>
+            <button className="btn btn-sm btn-outline-secondary" onClick={() => { setFiltroPago('todos'); setFiltroDeuda('todas') }}>Ver todas las ventas</button>
           </div>
         ) : (
-          <div className="d-flex flex-column gap-3">
-            {ventas.map(v => {
+          <div className="d-flex flex-column gap-3 mb-5">
+            {filteredVentas.map(v => {
               const est = estadoInfo(v.estado)
               const pInfo = pagoInfo(v.estado_pago)
               const abierta = expandida === v.id
