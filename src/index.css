@@ -889,3 +889,146 @@ body {
     flex-direction: column;
   }
 }
+
+/* ===== NUEVO: DETALLE PRODUCTO PREMIUM SPLIT ===== */
+.premium-detail-container {
+  display: flex;
+  min-height: calc(100vh - 80px);
+  background-color: #fff;
+  overflow: hidden;
+  position: relative;
+}
+
+@media (max-width: 991px) {
+  .premium-detail-container {
+    flex-direction: column;
+  }
+}
+
+.premium-detail-visual {
+  flex: 1.2;
+  position: relative;
+  background-color: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+}
+
+.premium-detail-content {
+  flex: 0.8;
+  padding: 4rem 3rem;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: white;
+  position: relative;
+}
+
+@media (max-width: 991px) {
+  .premium-detail-content {
+    padding: 2rem 1.5rem;
+  }
+}
+
+/* La curva fluida (blob transition) */
+.premium-detail-content::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -150px;
+  width: 300px;
+  height: 100%;
+  background: white;
+  border-radius: 50% 0 0 50% / 50% 0 0 50%;
+  z-index: -1;
+}
+
+@media (max-width: 991px) {
+  .premium-detail-content::before {
+    display: none;
+  }
+}
+
+.premium-detail-content h2 {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 1rem;
+  letter-spacing: -1px;
+}
+
+.premium-detail-content .category-badge {
+  display: inline-block;
+  padding: 0.4rem 1rem;
+  background: rgba(201, 168, 76, 0.1);
+  color: var(--primary-color);
+  border-radius: 30px;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.premium-detail-content .price-tag {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary-color);
+  margin-bottom: 2rem;
+}
+
+.premium-detail-content .description-text {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+  margin-bottom: 2.5rem;
+}
+
+.premium-detail-specs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+  padding: 1.5rem;
+  background: #fcfcfc;
+  border-radius: 16px;
+  border: 1px solid #f0f0f0;
+}
+
+.spec-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.spec-item .label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+}
+
+.spec-item .value {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+/* Ajustes carrusel para el nuevo layout */
+.premium-swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.premium-swiper .swiper-slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.premium-swiper img {
+  max-width: 85%;
+  max-height: 80%;
+  object-fit: contain;
+  filter: drop-shadow(0 20px 40px rgba(0,0,0,0.15));
+}

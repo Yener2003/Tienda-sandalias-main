@@ -69,130 +69,99 @@ function ProductoDetalle() {
     <>
       <Navbar />
       <main className="main">
-        {/* Page Title */}
-        <div className="page-title">
-          <div className="heading">
-            <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 1.5rem' }}>
-              <div className="row d-flex justify-content-center text-center">
-                <div className="col-lg-8">
-                  <h1>Detalles del producto.</h1>
-                  <p className="mb-0">{producto.descripcion}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <nav className="breadcrumbs">
-            <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 1.5rem' }}>
-              <ol>
+        <div className="premium-detail-container">
+          {/* Lado Visual (Carrusel) */}
+          <section className="premium-detail-visual fade-in-up">
+            <Swiper
+              modules={[Pagination, Autoplay]}
+              pagination={{ clickable: true }}
+              autoplay={{ delay: 5000 }}
+              loop={true}
+              speed={1000}
+              className="premium-swiper"
+            >
+              {carrusel.map((img, index) => (
+                <SwiperSlide key={index}>
+                  <img
+                    src={img}
+                    alt={`${producto.nombre} - imagen ${index + 1}`}
+                    onLoad={() => console.log('Imagen cargada')}
+                    onError={(e) => {
+                      e.target.src = producto.imagen_principal
+                    }}
+                  />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </section>
+
+          {/* Lado de Contenido */}
+          <section className="premium-detail-content fade-in-up" style={{ animationDelay: '0.2s' }}>
+            <nav className="breadcrumbs mb-4" style={{ background: 'none', padding: 0 }}>
+              <ol style={{ fontSize: '0.85rem' }}>
                 <li><Link to="/">Inicio</Link></li>
-                <li className="current">Detalles producto</li>
+                <li className="current">{producto.nombre}</li>
               </ol>
+            </nav>
+
+            <span className="category-badge">{producto.categoria}</span>
+            <h2>{producto.nombre}</h2>
+            <div className="price-tag">{precio}</div>
+            
+            <p className="description-text">
+              {producto.descripcion || 'Sin descripción disponible para este modelo premium.'}
+            </p>
+
+            <div className="premium-detail-specs">
+              <div className="spec-item">
+                <span className="label">Material</span>
+                <span className="value">{producto.material}</span>
+              </div>
+              <div className="spec-item">
+                <span className="label">Suela</span>
+                <span className="value">{producto.tipo_suela === 'alta' ? 'Alta' : 'Baja'}</span>
+              </div>
+              <div className="spec-item">
+                <span className="label">Referencia</span>
+                <span className="value">#{producto.id.toString().slice(-4)}</span>
+              </div>
+              <div className="spec-item">
+                <span className="label">Disponibilidad</span>
+                <span className="value">{producto.tallas}</span>
+              </div>
             </div>
-          </nav>
+
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="whatsapp-btn"
+              style={{ padding: '1.2rem 2rem' }}
+            >
+              <i className="bi bi-whatsapp"></i>
+              Realizar Pedido
+            </a>
+
+            <div style={{ marginTop: '2rem' }}>
+              <button
+                onClick={() => navigate(-1)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  padding: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}
+              >
+                <i className="bi bi-arrow-left"></i> Volver a la galería
+              </button>
+            </div>
+          </section>
         </div>
-
-        {/* Detalle */}
-        <section className="portfolio-details">
-          <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 1.5rem' }}>
-            <div className="row gy-5">
-              {/* Carrusel */}
-              <div className="col-lg-7 fade-in-up">
-                <div className="swiper-container-wrapper">
-                  {/* Mancha decorativa detrás */}
-                  <div className="blob-decoration"></div>
-                  
-                  {/* Marco orgánico del carrusel */}
-                  <div className="blob-frame">
-                    <Swiper
-                      modules={[Pagination, Autoplay]}
-                      pagination={{ clickable: true }}
-                      autoplay={{ delay: 5000 }}
-                      loop={true}
-                      speed={1000}
-                    >
-                      {carrusel.map((img, index) => (
-                        <SwiperSlide key={index}>
-                          <img
-                            src={img}
-                            alt={`${producto.nombre} - imagen ${index + 1}`}
-                            style={{ 
-                              width: '100%', 
-                              minHeight: '400px', 
-                              maxHeight: '600px', 
-                              objectFit: 'cover' /* Ahora la foto toma la forma de la mancha */
-                            }}
-                            onError={(e) => {
-                              e.target.src = producto.imagen_principal
-                            }}
-                          />
-                        </SwiperSlide>
-                      ))}
-                    </Swiper>
-                  </div>
-                </div>
-              </div>
-
-              {/* Info del producto */}
-              <div className="col-lg-5 fade-in-up" style={{ animationDelay: '0.2s' }}>
-                <div className="portfolio-info">
-                  <h3><i className="bi bi-stars"></i> Detalles Premium</h3>
-                  <ul>
-                    <li>
-                      <strong><i className="bi bi-tag"></i> Nombre</strong>
-                      <span>{producto.nombre}</span>
-                    </li>
-                    <li>
-                      <strong><i className="bi bi-gem"></i> Material</strong>
-                      <span>{producto.material}</span>
-                    </li>
-                    <li>
-                      <strong><i className="bi bi-cash-stack"></i> Precio</strong>
-                      <span style={{ color: '#c9a84c', fontWeight: '800', fontSize: '1.4rem' }}>
-                        {precio}
-                      </span>
-                    </li>
-                    <li>
-                      <strong><i className="bi bi-rulers"></i> Tallas</strong>
-                      <span>{producto.tallas}</span>
-                    </li>
-                    <li>
-                      <strong><i className="bi bi-info-circle"></i> Suela</strong>
-                      <span>{producto.tipo_suela === 'alta' ? 'Suela Alta' : 'Suela Baja'}</span>
-                    </li>
-                  </ul>
-
-                  {/* Botón WhatsApp */}
-                  <a
-                    href={whatsappUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="whatsapp-btn"
-                  >
-                    <i className="bi bi-whatsapp"></i>
-                    Pedir por WhatsApp
-                  </a>
-
-                  {/* Volver */}
-                  <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
-                    <button
-                      onClick={() => navigate(-1)}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: 'var(--text-muted)',
-                        textDecoration: 'underline',
-                        cursor: 'pointer',
-                        fontSize: '0.9rem'
-                      }}
-                    >
-                      ← Volver a la galería
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
       <Footer />
     </>
