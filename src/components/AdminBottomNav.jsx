@@ -6,8 +6,8 @@ function AdminBottomNav() {
 
   // Dynamic center button based on current module
   const getCenterAction = () => {
-    if (path.includes('/admin/productos')) return { icon: 'bi-plus-lg', path: '/admin/producto/nuevo' }
-    if (path.includes('/admin/clientes')) return { icon: 'bi-person-plus', path: '/admin/clientes' } // Modal handled in page usually, but we could add a dedicated /nuevo
+    if (path.includes('/admin/productos')) return { icon: 'bi-box-seam', path: '/admin/producto/nuevo' }
+    if (path.includes('/admin/clientes')) return { icon: 'bi-person-plus', path: '/admin/clientes?new=true' }
     return { icon: 'bi-plus-lg', path: '/admin/ventas/nueva' }
   }
 

@@ -16,6 +16,8 @@ function NuevaVenta() {
   const [tipoPago, setTipoPago] = useState('contado')
   const [numCuotas, setNumCuotas] = useState(2)
   const [fechaVencimiento, setFechaVencimiento] = useState('')
+  const [abonoInicial, setAbonoInicial] = useState(0)
+  const [tipoAbono, setTipoAbono] = useState('ninguno') // ninguno | parcial | total
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState('')
 
@@ -37,7 +39,9 @@ function NuevaVenta() {
     return sum + (p ? p.precio * parseInt(it.cantidad || 1) : 0)
   }, 0)
 
-  const valorCuota = tipoPago === 'credito' && numCuotas > 0 ? Math.ceil(total / numCuotas) : 0
+  const montoAbonoEfectivo = tipoAbono === 'total' ? total : (tipoAbono === 'parcial' ? abonoInicial : 0)
+  const saldoPendiente = Math.max(0, total - montoAbonoEfectivo)
+  const valorCuota = tipoPago === 'credito' && numCuotas > 0 ? Math.ceil(saldoPendiente / numCuotas) : 0
 
   const guardar = async (e) => {
     e.preventDefault()
@@ -52,6 +56,8 @@ function NuevaVenta() {
       tipo_pago: tipoPago,
       num_cuotas: tipoPago === 'credito' ? numCuotas : 1,
       fecha_vencimiento: tipoPago === 'credito' ? fechaVencimiento : null,
+      abono_inicial: tipoPago === 'credito' ? montoAbonoEfectivo : total,
+      estado_pago: tipoPago === 'contado' || tipoAbono === 'total' ? 'pagado' : (tipoAbono === 'parcial' && abonoInicial > 0 ? 'abonado' : 'pendiente'),
       items: itemsValidos.map(it => {
         const p = getProducto(it.producto_id)
         return { producto_id: p.id, nombre_producto: p.nombre, precio_unitario: p.precio, cantidad: parseInt(it.cantidad) }
@@ -161,6 +167,43 @@ function NuevaVenta() {
                 {tipoPago === 'credito' && (
                   <div style={{ background: 'var(--bg-color)', borderRadius: 12, padding: '1rem', border: '1px solid var(--border-color)', marginTop: '0.5rem' }}>
                     <div className="row g-3">
+                      <div className="col-12">
+                        <label className="form-label" style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 600 }}>
+                          Abono Inicial (Hoy)
+                        </label>
+                        <div className="d-flex gap-2">
+                          {[
+                            { val: 'ninguno', label: 'Sin abono' },
+                            { val: 'parcial', label: 'Abono parcial' },
+                            { val: 'total', label: 'Pagó hoy' },
+                          ].map(opt => (
+                            <button
+                              key={opt.val}
+                              type="button"
+                              className={`btn btn-sm flex-fill ${tipoAbono === opt.val ? 'btn-primary' : 'btn-outline-secondary'}`}
+                              onClick={() => setTipoAbono(opt.val)}
+                              style={tipoAbono === opt.val ? { background: 'var(--primary-color)', borderColor: 'var(--primary-color)' } : {}}
+                            >
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
+                        {tipoAbono === 'parcial' && (
+                          <div className="mt-2">
+                            <div className="input-group input-group-sm">
+                              <span className="input-group-text">$</span>
+                              <input
+                                type="number"
+                                className="form-control"
+                                placeholder="¿Cuánto abonó?"
+                                value={abonoInicial}
+                                onChange={e => setAbonoInicial(Math.min(total, parseInt(e.target.value || 0)))}
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      
                       <div className="col-sm-6">
                         <label className="form-label" style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 600 }}>
                           Número de cuotas *
@@ -175,7 +218,7 @@ function NuevaVenta() {
                           <button type="button" onClick={() => setNumCuotas(numCuotas + 1)}
                             style={{ width: 36, height: 36, borderRadius: 8, border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-main)', cursor: 'pointer', fontWeight: 700, fontSize: '1.1rem' }}>+</button>
                         </div>
-                        {total > 0 && (
+                        {saldoPendiente > 0 && (
                           <div style={{ textAlign: 'center', marginTop: '0.4rem', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
                             ≈ {formatCOP(valorCuota)} / cuota
                           </div>
@@ -255,10 +298,16 @@ function NuevaVenta() {
                       )}
                       <div className="d-flex justify-content-between mt-1">
                         <span style={{ color: 'var(--text-muted)' }}>Estado pago</span>
-                        <span style={{ fontWeight: 700, color: tipoPago === 'contado' ? '#2d6a4f' : '#f4a261' }}>
-                          {tipoPago === 'contado' ? '✅ Pagado' : '⏳ Pendiente'}
+                        <span style={{ fontWeight: 700, color: tipoPago === 'contado' || tipoAbono === 'total' ? '#2d6a4f' : (tipoAbono === 'parcial' ? '#f4a261' : '#f4a261') }}>
+                          {tipoPago === 'contado' || tipoAbono === 'total' ? '✅ Pagado' : (tipoAbono === 'parcial' ? '⏳ Abonado' : '⏳ Pendiente')}
                         </span>
                       </div>
+                      {tipoPago === 'credito' && montoAbonoEfectivo > 0 && (
+                        <div className="d-flex justify-content-between mt-1" style={{ borderTop: '1px dashed var(--border-color)', paddingTop: 4 }}>
+                          <span style={{ color: 'var(--text-muted)' }}>Saldo restante</span>
+                          <span style={{ fontWeight: 700, color: 'var(--primary-color)' }}>{formatCOP(saldoPendiente)}</span>
+                        </div>
+                      )}
                     </div>
                   </>
                 )}

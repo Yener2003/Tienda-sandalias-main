@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { getClientes, crearCliente, editarCliente, eliminarCliente } from '../../services/api'
 import AdminLayout from '../../components/AdminLayout'
@@ -18,10 +18,22 @@ function Clientes() {
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState('')
 
+  const location = useLocation()
+
   useEffect(() => {
     if (!usuario) { navigate('/admin/login'); return }
     cargar()
   }, [usuario, navigate])
+
+  useEffect(() => {
+    // Escuchar cambios en la URL para abrir el modal (botón central mobile)
+    const params = new URLSearchParams(location.search)
+    if (params.get('new') === 'true') {
+      abrirNuevo()
+      // Limpiar el parámetro para evitar reaperturas accidentales al recargar
+      navigate('/admin/clientes', { replace: true })
+    }
+  }, [location.search])
 
   const cargar = async () => {
     try { setClientes(await getClientes()) } catch { setError('Error cargando clientes') }
@@ -71,7 +83,7 @@ function Clientes() {
             <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.85rem' }}>{clientes.length} registrados</p>
           </div>
           <div className="d-flex gap-2">
-            <button onClick={abrirNuevo} className="btn btn-sm" style={{ background: '#2d6a4f', color: '#fff' }}>+ Nuevo</button>
+            <button onClick={abrirNuevo} className="btn btn-sm d-none d-md-block" style={{ background: '#2d6a4f', color: '#fff' }}>+ Nuevo</button>
             <button onClick={() => navigate('/admin/dashboard')} className="btn btn-outline-secondary btn-sm d-none d-md-block">← Inicio</button>
           </div>
         </div>

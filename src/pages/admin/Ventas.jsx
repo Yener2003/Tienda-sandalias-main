@@ -14,7 +14,8 @@ const ESTADOS = [
 
 const ESTADOS_PAGO = [
   { value: 'pendiente', label: '⏳ Pendiente', color: '#f4a261' },
-  { value: 'pagado', label: '✅ Pagado', color: '#2d6a4f' },
+  { value: 'abonado',   label: '💰 Abonado',   color: '#4895ef' },
+  { value: 'pagado',    label: '✅ Pagado',    color: '#2d6a4f' },
 ]
 
 const estadoInfo = (val) => ESTADOS.find(e => e.value === val) || ESTADOS[0]
@@ -83,10 +84,8 @@ function Ventas() {
         <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
           <div>
             <h2 style={{ color: 'var(--text-main)', fontWeight: 800 }}>Ventas</h2>
-            <p style={{ color: 'var(--text-muted)', margin: 0 }}>Historial y seguimiento de ventas</p>
           </div>
-          <div className="d-flex gap-2 flex-wrap d-none d-md-flex">
-            <button onClick={() => navigate('/admin/dashboard')} className="btn btn-outline-secondary btn-sm">← Dashboard</button>
+          <div className="d-flex gap-2">
             <Link to="/admin/clientes" className="btn btn-outline-secondary btn-sm">
               <i className="bi bi-people me-1"></i>Clientes
             </Link>
@@ -214,14 +213,17 @@ function Ventas() {
                         <div className="col-md-5">
                            {v.tipo_pago === 'credito' && (
                             <div className="mb-3 p-2 rounded" style={{ background: 'rgba(201,168,76,0.05)', border: '1px solid var(--border-color)' }}>
-                              <p style={{ color: 'var(--primary-color)', fontWeight: 700, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 1, marginBottom: '0.3rem' }}>Información de Crédito</p>
                               <div className="d-flex justify-content-between mb-1" style={{ fontSize: '0.82rem' }}>
-                                <span style={{ color: 'var(--text-muted)' }}>Cuotas:</span>
-                                <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{v.num_cuotas}</span>
+                                <span style={{ color: 'var(--text-muted)' }}>Abono inicial:</span>
+                                <span style={{ fontWeight: 600, color: '#2d6a4f' }}>{formatCOP(v.abono_inicial || 0)}</span>
+                              </div>
+                              <div className="d-flex justify-content-between mb-1" style={{ fontSize: '0.82rem' }}>
+                                <span style={{ color: 'var(--text-muted)' }}>Saldo pendiente:</span>
+                                <span style={{ fontWeight: 700, color: 'var(--primary-color)' }}>{formatCOP(v.total - (v.abono_inicial || 0))}</span>
                               </div>
                               <div className="d-flex justify-content-between mb-1" style={{ fontSize: '0.82rem' }}>
                                 <span style={{ color: 'var(--text-muted)' }}>Valor cuota:</span>
-                                <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{formatCOP(Math.ceil(v.total / v.num_cuotas))}</span>
+                                <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{v.num_cuotas > 0 ? formatCOP(Math.ceil((v.total - (v.abono_inicial || 0)) / v.num_cuotas)) : '—'}</span>
                               </div>
                               <div className="d-flex justify-content-between" style={{ fontSize: '0.82rem' }}>
                                 <span style={{ color: 'var(--text-muted)' }}>Vencimiento:</span>

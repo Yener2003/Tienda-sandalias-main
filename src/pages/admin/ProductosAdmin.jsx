@@ -54,7 +54,7 @@ function ProductosAdmin() {
             <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.85rem' }}>{productos.length} productos registrados</p>
           </div>
           <div className="d-flex gap-2">
-            <Link to="/admin/producto/nuevo" className="btn btn-sm" style={{ background: '#2d6a4f', color: '#fff' }}>
+            <Link to="/admin/producto/nuevo" className="btn btn-sm d-none d-md-block" style={{ background: '#2d6a4f', color: '#fff' }}>
               + Nuevo
             </Link>
             <Link to="/" className="btn btn-outline-secondary btn-sm d-none d-md-block">Ver Tienda</Link>

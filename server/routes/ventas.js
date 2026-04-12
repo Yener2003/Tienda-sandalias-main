@@ -37,7 +37,7 @@ router.get('/', verificarToken, async (req, res) => {
 
 // POST /api/ventas — Crear nueva venta
 router.post('/', verificarToken, async (req, res) => {
-  const { cliente_id, items, notas = '', tipo_pago = 'contado', num_cuotas = 1, fecha_vencimiento = null } = req.body;
+  const { cliente_id, items, notas = '', tipo_pago = 'contado', num_cuotas = 1, fecha_vencimiento = null, abono_inicial = 0, estado_pago = null } = req.body;
 
   if (!items || items.length === 0) {
     return res.status(400).json({ error: 'La venta debe tener al menos un producto' });
@@ -49,13 +49,13 @@ router.post('/', verificarToken, async (req, res) => {
 
     const total = items.reduce((sum, item) => sum + (item.precio_unitario * item.cantidad), 0);
 
-    // estado_pago inicial: contado => 'pagado', credito => 'pendiente'
-    const estado_pago = tipo_pago === 'contado' ? 'pagado' : 'pendiente';
+    // estado_pago inicial: contado => 'pagado', credito => usar el enviado o 'pendiente'
+    const final_estado_pago = estado_pago || (tipo_pago === 'contado' ? 'pagado' : 'pendiente');
 
     const { rows: ventaRows } = await client.query(
-      `INSERT INTO ventas (cliente_id, total, notas, estado, estado_pago, tipo_pago, num_cuotas, fecha_vencimiento)
-       VALUES ($1, $2, $3, 'pendiente', $4, $5, $6, $7) RETURNING *`,
-      [cliente_id || null, total, notas, estado_pago, tipo_pago, parseInt(num_cuotas), fecha_vencimiento || null]
+      `INSERT INTO ventas (cliente_id, total, notas, estado, estado_pago, tipo_pago, num_cuotas, fecha_vencimiento, abono_inicial)
+       VALUES ($1, $2, $3, 'pendiente', $4, $5, $6, $7, $8) RETURNING *`,
+      [cliente_id || null, total, notas, final_estado_pago, tipo_pago, parseInt(num_cuotas), fecha_vencimiento || null, parseInt(abono_inicial)]
     );
     const venta = ventaRows[0];
 
@@ -101,7 +101,7 @@ router.patch('/:id/estado', verificarToken, async (req, res) => {
 // PATCH /api/ventas/:id/pago — Cambiar estado de pago
 router.patch('/:id/pago', verificarToken, async (req, res) => {
   const { estado_pago } = req.body;
-  if (!['pagado', 'pendiente'].includes(estado_pago)) {
+  if (!['pagado', 'pendiente', 'abonado'].includes(estado_pago)) {
     return res.status(400).json({ error: 'Estado de pago inválido' });
   }
   try {
