@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { getClientes, getProductosAdmin, crearVenta } from '../../services/api'
 import AdminLayout from '../../components/AdminLayout'
+import ReceiptModal from '../../components/ReceiptModal'
 
 function NuevaVenta() {
   const { usuario } = useAuth()
@@ -19,6 +20,8 @@ function NuevaVenta() {
   const [abonoInicial, setAbonoInicial] = useState(0)
   const [tipoAbono, setTipoAbono] = useState('ninguno') // ninguno | parcial | total
   const [frecuenciaPago, setFrecuenciaPago] = useState('unico') // unico | semanal | quincenal | mensual
+  const [ventaCreada, setVentaCreada] = useState(null)
+  const [verTirillaFinal, setVerTirillaFinal] = useState(false)
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState('')
 
@@ -78,7 +81,10 @@ function NuevaVenta() {
       })
     }
     setGuardando(true)
-    try { await crearVenta(payload); navigate('/admin/ventas') }
+    try { 
+      const res = await crearVenta(payload)
+      setVentaCreada(res.venta)
+    }
     catch (err) { setError(err.message) }
     setGuardando(false)
   }
@@ -397,6 +403,42 @@ function NuevaVenta() {
             </div>
           </div>
         </form>
+        {ventaCreada && (
+           <div className="modal fade show d-block" style={{ background: 'rgba(0,0,0,0.8)', zIndex: 1100 }}>
+             <div className="modal-dialog modal-dialog-centered">
+               <div className="modal-content border-0 p-4 text-center" style={{ borderRadius: 20 }}>
+                  <div className="mb-3">
+                    <i className="bi bi-check-circle-fill text-success" style={{ fontSize: '4rem' }}></i>
+                  </div>
+                  <h3 style={{ fontWeight: 800 }}>¡Venta Exitosa!</h3>
+                  <p className="text-muted">La venta se ha registrado correctamente en el sistema.</p>
+                  <div className="d-grid gap-2 mt-4">
+                     <button 
+                       className="btn btn-primary rounded-pill p-3 border-0" 
+                       style={{ background: 'var(--primary-color)', fontWeight: 700 }}
+                       onClick={() => {
+                          const itemsDetallados = items.filter(it => it.producto_id).map(it => {
+                             const p = getProducto(it.producto_id);
+                             return { ...it, nombre_producto: p.nombre, precio_unitario: p.precio }
+                          });
+                          setVentaCreada({ ...ventaCreada, items: itemsDetallados });
+                          setVerTirillaFinal(true);
+                       }}
+                     >
+                       <i className="bi bi-receipt me-2"></i> Ver Tirilla de Venta
+                     </button>
+                     <button className="btn btn-outline-secondary rounded-pill p-3" onClick={() => navigate('/admin/ventas')}>
+                       Volver al Listado
+                     </button>
+                  </div>
+               </div>
+             </div>
+           </div>
+        )}
+
+        {verTirillaFinal && (
+          <ReceiptModal venta={ventaCreada} onClose={() => navigate('/admin/ventas')} />
+        )}
       </main>
     </AdminLayout>
   )

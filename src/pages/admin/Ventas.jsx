@@ -5,6 +5,7 @@ import { getVentas, cambiarEstadoVenta, cambiarEstadoPagoVenta, eliminarVenta, r
 
 import AdminLayout from '../../components/AdminLayout'
 import LoadingSpinner from '../../components/LoadingSpinner'
+import ReceiptModal from '../../components/ReceiptModal'
 
 const ESTADOS = [
   { value: 'pendiente', label: 'Pendiente', color: '#f4a261' },
@@ -39,6 +40,8 @@ function Ventas() {
   const [medioPago, setMedioPago] = useState('efectivo')
   const [tipoPagoModal, setTipoPagoModal] = useState('total') // total | abono
   const [procesandoPago, setProcesandoPago] = useState(false)
+  const [ventaRecibo, setVentaRecibo] = useState(null)
+  const [mostrarRecibo, setMostrarRecibo] = useState(false)
 
 
   useEffect(() => {
@@ -198,44 +201,28 @@ function Ventas() {
                       <i className={`bi bi-chevron-${abierta ? 'up' : 'down'}`} style={{ color: 'var(--text-muted)', flexShrink: 0 }}></i>
                     </div>
 
-                    {/* Fila 2: Selectores + Acciones */}
+                    {/* Fila 2: Selectores */}
                     <div className="d-flex align-items-center gap-2 flex-wrap" onClick={e => e.stopPropagation()}>
-                      {/* Estado Entrega */}
-                      <select
-                        className="form-select form-select-sm"
-                        value={v.estado}
-                        onChange={e => cambiarEstado(v.id, e.target.value)}
-                        style={{ background: est.color + '22', color: est.color, border: `1px solid ${est.color}44`, fontWeight: 700, borderRadius: 20, width: 'auto', flex: '1 1 auto', minWidth: 110, maxWidth: 150 }}
-                      >
-                        {ESTADOS.map(e => <option key={e.value} value={e.value}>{e.label}</option>)}
-                      </select>
+                      <div className="d-flex gap-2 flex-wrap" style={{ flex: '1 1 auto' }}>
+                        {/* Estado Entrega */}
+                        <select
+                          className="form-select form-select-sm"
+                          value={v.estado}
+                          onChange={e => cambiarEstado(v.id, e.target.value)}
+                          style={{ background: est.color + '22', color: est.color, border: `1px solid ${est.color}44`, fontWeight: 700, borderRadius: 20, width: 'auto', minWidth: 110, maxWidth: 150 }}
+                        >
+                          {ESTADOS.map(e => <option key={e.value} value={e.value}>{e.label}</option>)}
+                        </select>
 
-                      {/* Estado Pago */}
-                      <select
-                        className="form-select form-select-sm"
-                        value={v.estado_pago}
-                        onChange={e => cambiarPago(v.id, e.target.value)}
-                        style={{ background: pInfo.color + '22', color: pInfo.color, border: `1px solid ${pInfo.color}44`, fontWeight: 700, borderRadius: 20, width: 'auto', flex: '1 1 auto', minWidth: 120, maxWidth: 160 }}
-                      >
-                        {ESTADOS_PAGO.map(e => <option key={e.value} value={e.value}>{e.label}</option>)}
-                      </select>
-
-                      {/* Acciones */}
-                      <div className="d-flex gap-2 align-items-center ms-auto">
-                        {(v.estado_pago === 'pendiente' || v.estado_pago === 'abonado') && (
-                          <button 
-                            onClick={() => abrirModalPago(v)} 
-                            className="btn btn-sm" 
-                            style={{ background: '#2d6a4f', color: '#fff', borderRadius: 20, fontSize: '0.75rem', padding: '0.2rem 0.75rem', fontWeight: 600, flexShrink: 0 }}
-                          >
-                            💸 Pagar
-                          </button>
-                        )}
-                        <div className="d-none d-md-block">
-                          <button onClick={() => borrar(v.id)} className="btn btn-sm btn-outline-danger" title="Eliminar">
-                            <i className="bi bi-trash"></i>
-                          </button>
-                        </div>
+                        {/* Estado Pago */}
+                        <select
+                          className="form-select form-select-sm"
+                          value={v.estado_pago}
+                          onChange={e => cambiarPago(v.id, e.target.value)}
+                          style={{ background: pInfo.color + '22', color: pInfo.color, border: `1px solid ${pInfo.color}44`, fontWeight: 700, borderRadius: 20, width: 'auto', minWidth: 120, maxWidth: 160 }}
+                        >
+                          {ESTADOS_PAGO.map(e => <option key={e.value} value={e.value}>{e.label}</option>)}
+                        </select>
                       </div>
                     </div>
                   </div>
@@ -295,9 +282,32 @@ function Ventas() {
                               <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>{v.notas}</p>
                             </>
                           )}
-                          <div className="mt-3 d-md-none">
-                            <button onClick={() => borrar(v.id)} className="btn btn-sm btn-outline-danger w-100">
-                                <i className="bi bi-trash me-1"></i> Eliminar Venta
+                          
+                          {/* Acciones en vista expandida */}
+                          <div className="mt-4 d-flex gap-2 flex-wrap" onClick={e => e.stopPropagation()}>
+                            {(v.estado_pago === 'pendiente' || v.estado_pago === 'abonado') && (
+                              <button 
+                                onClick={() => abrirModalPago(v)} 
+                                className="btn btn-success flex-fill rounded-pill" 
+                                style={{ fontWeight: 700, border: 'none', background: '#2d6a4f' }}
+                              >
+                                💸 Registrar Pago
+                              </button>
+                            )}
+                            <button 
+                              className="btn btn-outline-info flex-fill rounded-pill" 
+                              style={{ fontWeight: 600 }}
+                              onClick={() => { setVentaRecibo(v); setMostrarRecibo(true); }}
+                            >
+                              <i className="bi bi-receipt me-2"></i> Ver Tirilla
+                            </button>
+                            <button 
+                              onClick={() => borrar(v.id)} 
+                              className="btn btn-outline-danger rounded-pill" 
+                              style={{ width: 'auto' }}
+                              title="Eliminar venta"
+                            >
+                              <i className="bi bi-trash"></i>
                             </button>
                           </div>
                         </div>
@@ -390,6 +400,12 @@ function Ventas() {
             </div>
           </div>
         </div>
+      )}
+      {mostrarRecibo && (
+        <ReceiptModal 
+          venta={ventaRecibo} 
+          onClose={() => { setMostrarRecibo(false); setVentaRecibo(null); }} 
+        />
       )}
     </AdminLayout>
 
