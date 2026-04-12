@@ -2,9 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { getClientes, getProductosAdmin, crearVenta } from '../../services/api'
-import Navbar from '../../components/Navbar'
-import Footer from '../../components/Footer'
-import AdminBottomNav from '../../components/AdminBottomNav'
+import AdminLayout from '../../components/AdminLayout'
 
 function NuevaVenta() {
   const { usuario } = useAuth()
@@ -23,11 +21,9 @@ function NuevaVenta() {
 
   useEffect(() => {
     if (!usuario) { navigate('/admin/login'); return }
-    document.body.classList.add('admin-body')
     Promise.all([getClientes(), getProductosAdmin()])
       .then(([cls, prods]) => { setClientes(cls); setProductos(prods) })
       .catch(() => setError('Error cargando datos'))
-    return () => document.body.classList.remove('admin-body')
   }, [usuario, navigate])
 
   const agregarItem = () => setItems([...items, { producto_id: '', cantidad: 1 }])
@@ -71,9 +67,8 @@ function NuevaVenta() {
     new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(n)
 
   return (
-    <>
-      <Navbar />
-      <main className="main container py-5" style={{ minHeight: '80vh' }}>
+    <AdminLayout>
+      <main className="container py-4">
         <div className="d-flex justify-content-between align-items-center mb-4">
           <div>
             <h2 style={{ color: 'var(--text-main)', fontWeight: 800 }}>Nueva Venta</h2>
@@ -276,9 +271,7 @@ function NuevaVenta() {
           </div>
         </form>
       </main>
-      <AdminBottomNav />
-      <Footer />
-    </>
+    </AdminLayout>
   )
 }
 

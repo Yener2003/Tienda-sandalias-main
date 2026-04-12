@@ -2,9 +2,8 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { getVentas, cambiarEstadoVenta, cambiarEstadoPagoVenta, eliminarVenta } from '../../services/api'
-import Navbar from '../../components/Navbar'
-import Footer from '../../components/Footer'
-import AdminBottomNav from '../../components/AdminBottomNav'
+import AdminLayout from '../../components/AdminLayout'
+import LoadingSpinner from '../../components/LoadingSpinner'
 
 const ESTADOS = [
   { value: 'pendiente', label: 'Pendiente', color: '#f4a261' },
@@ -36,9 +35,7 @@ function Ventas() {
 
   useEffect(() => {
     if (!usuario) { navigate('/admin/login'); return }
-    document.body.classList.add('admin-body')
     cargar()
-    return () => document.body.classList.remove('admin-body')
   }, [usuario, navigate])
 
   const cargar = async () => {
@@ -72,10 +69,15 @@ function Ventas() {
   const porCobrar = totalVentas - cobrado
   const pendientes = ventas.filter(v => v.estado === 'pendiente').length
 
+  if (cargando) return (
+    <AdminLayout>
+      <LoadingSpinner />
+    </AdminLayout>
+  )
+
   return (
-    <>
-      <Navbar />
-      <main className="main container py-5" style={{ minHeight: '80vh' }}>
+    <AdminLayout>
+      <main className="container py-4">
 
         {/* Header */}
         <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
@@ -248,9 +250,7 @@ function Ventas() {
           </div>
         )}
       </main>
-      <AdminBottomNav />
-      <Footer />
-    </>
+    </AdminLayout>
   )
 }
 

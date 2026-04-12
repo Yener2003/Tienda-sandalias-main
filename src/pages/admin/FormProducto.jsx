@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { crearProducto, editarProducto, getProducto } from '../../services/api'
-import Navbar from '../../components/Navbar'
-import Footer from '../../components/Footer'
+import { crearProducto, editarProducto, getProducto, describirImagenIA } from '../../services/api'
+import AdminLayout from '../../components/AdminLayout'
+import LoadingSpinner from '../../components/LoadingSpinner'
 
 function FormProducto() {
   const { id } = useParams()
@@ -29,14 +29,10 @@ function FormProducto() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    if (!usuario) {
-      navigate('/admin/login')
-      return
-    }
     if (esEdicion) {
       cargarProducto()
     }
-  }, [id, usuario, navigate])
+  }, [id])
 
   const cargarProducto = async () => {
     try {
@@ -116,7 +112,7 @@ function FormProducto() {
     try {
       const formDataIA = new FormData()
       formDataIA.append('imagen', imagenPrincipal)
-      const data = await import('../../services/api').then(m => m.describirImagenIA(formDataIA))
+      const data = await describirImagenIA(formDataIA)
       setFormData(prev => ({
         ...prev,
         nombre: data.nombre,
@@ -124,7 +120,6 @@ function FormProducto() {
       }))
     } catch (err) {
       console.error(err)
-      // Priorizar el mensaje amigable del servidor si existe
       const msg = err.response?.data?.error || err.message || 'Error al generar con IA'
       setError(msg)
     } finally {
@@ -133,9 +128,8 @@ function FormProducto() {
   }
 
   return (
-    <>
-      <Navbar />
-      <main className="main container py-5">
+    <AdminLayout>
+      <main className="container py-4">
         <div className="row justify-content-center">
           <div className="col-lg-8 admin-card">
             <h2 className="mb-4">{esEdicion ? 'Editar Producto' : 'Nuevo Producto'}</h2>
@@ -226,8 +220,7 @@ function FormProducto() {
           </div>
         </div>
       </main>
-      <Footer />
-    </>
+    </AdminLayout>
   )
 }
 
