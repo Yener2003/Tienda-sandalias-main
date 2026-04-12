@@ -117,6 +117,31 @@ router.patch('/:id/pago', verificarToken, async (req, res) => {
   }
 });
 
+// PATCH /api/ventas/:id/registrar-pago — Registrar un nuevo pago (abono o total)
+router.patch('/:id/registrar-pago', verificarToken, async (req, res) => {
+  const { monto, medio_pago, estado_pago } = req.body;
+  const { id } = req.params;
+
+  try {
+    const { rows } = await pool.query(
+      `UPDATE ventas 
+       SET abono_inicial = abono_inicial + $1, 
+           medio_pago = $2, 
+           estado_pago = $3, 
+           updated_at = NOW() 
+       WHERE id = $4 
+       RETURNING *`,
+      [parseInt(monto), medio_pago, estado_pago, id]
+    );
+
+    if (rows.length === 0) return res.status(404).json({ error: 'Venta no encontrada' });
+    res.json({ mensaje: '✅ Pago registrado correctamente', venta: rows[0] });
+  } catch (err) {
+    console.error('Error registrando pago:', err);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
 
 // DELETE /api/ventas/:id — Eliminar venta
 router.delete('/:id', verificarToken, async (req, res) => {

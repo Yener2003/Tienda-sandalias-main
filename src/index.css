@@ -2,7 +2,7 @@
 :root {
   --primary-color: #c9a84c;
   --primary-hover: #b8923e;
-  
+
   /* Colores Light Mode */
   --bg-color: #ffffff;
   --bg-secondary: #f9f9f9;
@@ -14,7 +14,7 @@
   --border-color: #eeeeee;
 }
 
-[data-theme='dark'] {
+[data-theme="dark"] {
   --bg-color: #121212;
   --bg-secondary: #1e1e1e;
   --text-main: #f5f5f5;
@@ -35,7 +35,9 @@ body {
   font-family: "Poppins", sans-serif;
   background-color: var(--bg-color);
   color: var(--text-main);
-  transition: background-color 0.3s, color 0.3s;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
 }
 
 /* ===== NAVBAR ===== */
@@ -291,7 +293,9 @@ body {
   width: 100%;
   height: 260px;
   object-fit: contain; /* Cambiado de cover a contain para ver la sandalia completa */
-  background-color: var(--bg-secondary); /* Fondo para cuando la imagen no llena el cuadro */
+  background-color: var(
+    --bg-secondary
+  ); /* Fondo para cuando la imagen no llena el cuadro */
   transition: transform 0.4s;
 }
 
@@ -353,12 +357,12 @@ body {
   height: 85%;
   object-fit: contain;
   transition: all 0.5s ease;
-  filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+  filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1));
 }
 
 .producto-card:hover .blob-card-img {
   transform: scale(1.15) translateY(-10px);
-  filter: drop-shadow(0 20px 25px rgba(0,0,0,0.2));
+  filter: drop-shadow(0 20px 25px rgba(0, 0, 0, 0.2));
 }
 
 /* Load more */
@@ -434,7 +438,11 @@ body {
 /* ===== DETALLE PRODUCTO PREMIUM ===== */
 .portfolio-details {
   padding: 5rem 0;
-  background: linear-gradient(180deg, var(--bg-main) 0%, var(--bg-secondary) 100%);
+  background: linear-gradient(
+    180deg,
+    var(--bg-main) 0%,
+    var(--bg-secondary) 100%
+  );
 }
 
 .portfolio-info {
@@ -448,7 +456,7 @@ body {
   transition: all 0.4s ease;
 }
 
-[data-theme='dark'] .portfolio-info {
+[data-theme="dark"] .portfolio-info {
   background: rgba(0, 0, 0, 0.2);
   border-color: rgba(201, 168, 76, 0.1);
 }
@@ -497,7 +505,6 @@ body {
   font-size: 1.1rem;
 }
 
-
 /* Carrusel Detalle con Forma Orgánica (Blob) */
 .swiper-container-wrapper {
   position: relative;
@@ -534,19 +541,29 @@ body {
   animation: rotate-blob 15s linear infinite;
 }
 
-[data-theme='dark'] .blob-decoration {
+[data-theme="dark"] .blob-decoration {
   opacity: 0.25;
 }
 
 @keyframes morph-blob {
-  0% { border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%; }
-  50% { border-radius: 70% 30% 46% 54% / 30% 59% 41% 70%; }
-  100% { border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%; }
+  0% {
+    border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+  }
+  50% {
+    border-radius: 70% 30% 46% 54% / 30% 59% 41% 70%;
+  }
+  100% {
+    border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+  }
 }
 
 @keyframes rotate-blob {
-  from { transform: translate(-50%, -50%) rotate(0deg); }
-  to { transform: translate(-50%, -50%) rotate(360deg); }
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }
 
 /* Swiper custom */
@@ -712,7 +729,6 @@ body {
   animation: fadeInUp 0.6s ease forwards;
 }
 
-
 .producto-item {
   animation: fadeInUp 0.5s ease forwards;
 }
@@ -753,11 +769,15 @@ body {
 }
 
 @keyframes spin-premium {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes spin-premium-reverse {
-  to { transform: rotate(-360deg); }
+  to {
+    transform: rotate(-360deg);
+  }
 }
 
 .loading-text {
@@ -771,8 +791,14 @@ body {
 }
 
 @keyframes pulse-text {
-  from { opacity: 0.5; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0.5;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* ===== THEME TOGGLE ===== */
@@ -797,17 +823,16 @@ body {
   transform: rotate(15deg) scale(1.1);
 }
 
-[data-theme='dark'] .header {
+[data-theme="dark"] .header {
   background: var(--header-bg);
 }
 
-[data-theme='dark'] .card {
+[data-theme="dark"] .card {
   background-color: var(--bg-secondary);
   border-color: var(--border-color);
 }
 
-
-[data-theme='dark'] .producto-card {
+[data-theme="dark"] .producto-card {
   background-color: var(--bg-secondary);
 }
 
@@ -822,35 +847,34 @@ body {
   transition: all 0.3s ease;
 }
 
-[data-theme='dark'] .admin-card h2 {
+[data-theme="dark"] .admin-card h2 {
   color: var(--text-main);
 }
 
 /* Form controls in dark mode */
-[data-theme='dark'] .form-control,
-[data-theme='dark'] .form-select {
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
   background-color: #1a1a1a !important;
   border-color: var(--border-color) !important;
   color: var(--text-main) !important;
 }
 
-
-[data-theme='dark'] .form-control::placeholder {
+[data-theme="dark"] .form-control::placeholder {
   color: var(--text-muted);
 }
 
-[data-theme='dark'] .form-check-input {
+[data-theme="dark"] .form-check-input {
   background-color: #1a1a1a;
   border-color: var(--border-color);
 }
 
-[data-theme='dark'] .form-check-input:checked {
+[data-theme="dark"] .form-check-input:checked {
   background-color: var(--primary-color);
   border-color: var(--primary-color);
 }
 
 /* ===== TABLA ADMIN - DARK MODE ===== */
-[data-theme='dark'] .table {
+[data-theme="dark"] .table {
   color: var(--text-main) !important;
   --bs-table-color: var(--text-main);
   --bs-table-bg: transparent;
@@ -859,28 +883,27 @@ body {
   --bs-table-border-color: var(--border-color);
 }
 
-[data-theme='dark'] .table > :not(caption) > * > * {
+[data-theme="dark"] .table > :not(caption) > * > * {
   background-color: transparent !important;
   color: var(--text-main) !important;
   border-bottom-color: var(--border-color);
 }
 
-[data-theme='dark'] .table-hover > tbody > tr:hover > * {
+[data-theme="dark"] .table-hover > tbody > tr:hover > * {
   background-color: rgba(255, 255, 255, 0.05) !important;
   color: var(--text-main) !important;
 }
 
-[data-theme='dark'] .btn-outline-secondary {
+[data-theme="dark"] .btn-outline-secondary {
   color: var(--text-muted);
   border-color: var(--border-color);
 }
 
-[data-theme='dark'] .btn-outline-secondary:hover {
-  background: rgba(255,255,255,0.08);
+[data-theme="dark"] .btn-outline-secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
   color: var(--text-main);
   border-color: var(--text-muted);
 }
-
 
 /* ===== RESPONSIVIDAD AVANZADA (MOBILE FIRST) ===== */
 
@@ -951,14 +974,20 @@ body {
     padding-left: 1rem;
     padding-right: 1rem;
   }
-  
+
   .btn {
     width: 100%;
     margin-bottom: 0.5rem;
   }
-  
-  .d-flex.gap-2 {
-    flex-direction: column;
+
+  /* Aplicar esto solo cuando realmente queramos que se apilen en móvil */
+  .flex-mobile-column {
+    flex-direction: column !important;
+  }
+
+  .admin-card {
+    padding: 1.25rem;
+    height: auto !important; /* Evitar estiramiento vertical forzado */
   }
 }
 
@@ -982,7 +1011,11 @@ body {
   position: sticky;
   top: 0;
   height: 100vh;
-  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-color) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--bg-secondary) 0%,
+    var(--bg-color) 100%
+  );
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1010,14 +1043,14 @@ body {
   filter: blur(1px);
   z-index: -1;
   animation: morph-blob-premium 12s ease-in-out infinite alternate;
-  border: 1px solid rgba(0,0,0,0.03);
-  box-shadow: 0 20px 50px rgba(0,0,0,0.03);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.03);
 }
 
-[data-theme='dark'] .premium-image-blob {
+[data-theme="dark"] .premium-image-blob {
   background: #151515;
-  border-color: rgba(255,255,255,0.03);
-  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  border-color: rgba(255, 255, 255, 0.03);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
 }
 
 .main-image-display img {
@@ -1025,7 +1058,7 @@ body {
   max-height: 85%;
   object-fit: contain;
   transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-  filter: drop-shadow(0 20px 40px rgba(0,0,0,0.15));
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.15));
   animation: float-sandalia 5s ease-in-out infinite;
 }
 
@@ -1057,20 +1090,40 @@ body {
 }
 
 @keyframes blob-shock {
-  0% { transform: scale(1); filter: blur(2px) brightness(1); }
-  30% { transform: scale(1.15); filter: blur(5px) brightness(1.2); }
-  100% { transform: scale(1); filter: blur(1px) brightness(1); }
+  0% {
+    transform: scale(1);
+    filter: blur(2px) brightness(1);
+  }
+  30% {
+    transform: scale(1.15);
+    filter: blur(5px) brightness(1.2);
+  }
+  100% {
+    transform: scale(1);
+    filter: blur(1px) brightness(1);
+  }
 }
 
 @keyframes morph-blob-premium {
-  0% { border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%; }
-  50% { border-radius: 70% 30% 46% 54% / 30% 59% 41% 70%; }
-  100% { border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%; }
+  0% {
+    border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+  }
+  50% {
+    border-radius: 70% 30% 46% 54% / 30% 59% 41% 70%;
+  }
+  100% {
+    border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+  }
 }
 
 @keyframes float-sandalia {
-  0%, 100% { transform: translateY(0) rotate(0); }
-  50% { transform: translateY(-15px) rotate(2deg); }
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  50% {
+    transform: translateY(-15px) rotate(2deg);
+  }
 }
 
 .variant-selector {
@@ -1092,7 +1145,7 @@ body {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   background-color: var(--bg-color);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   padding: 2px;
 }
 
@@ -1105,7 +1158,7 @@ body {
 
 .variant-dot:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .variant-dot.active {
@@ -1239,8 +1292,12 @@ body {
 
 /* Animaciones Globales */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .fade-in {
@@ -1254,10 +1311,10 @@ body {
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  height: 100%;
+  height: auto;
 }
 
-.table-compact th, 
+.table-compact th,
 .table-compact td {
   padding: 0.5rem 0.5rem !important;
   font-size: 0.85rem;

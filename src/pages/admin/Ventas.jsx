@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { getVentas, cambiarEstadoVenta, cambiarEstadoPagoVenta, eliminarVenta } from '../../services/api'
+import { getVentas, cambiarEstadoVenta, cambiarEstadoPagoVenta, eliminarVenta, registrarPagoVenta } from '../../services/api'
+
 import AdminLayout from '../../components/AdminLayout'
 import LoadingSpinner from '../../components/LoadingSpinner'
 
@@ -33,6 +34,12 @@ function Ventas() {
   const [ventas, setVentas] = useState([])
   const [cargando, setCargando] = useState(true)
   const [expandida, setExpandida] = useState(null)
+  const [ventaPago, setVentaPago] = useState(null) // Venta seleccionada para pagar
+  const [montoPago, setMontoPago] = useState(0)
+  const [medioPago, setMedioPago] = useState('efectivo')
+  const [tipoPagoModal, setTipoPagoModal] = useState('total') // total | abono
+  const [procesandoPago, setProcesandoPago] = useState(false)
+
 
   useEffect(() => {
     if (!usuario) { navigate('/admin/login'); return }
@@ -58,12 +65,39 @@ function Ventas() {
       setVentas(ventas.map(v => v.id === id ? { ...v, estado_pago } : v))
     } catch (err) { alert(err.message) }
   }
+  const confirmarPago = async () => {
+    if (montoPago <= 0) return alert('Ingrese un monto válido')
+    setProcesandoPago(true)
+    try {
+      const saldoRestante = ventaPago.total - (ventaPago.abono_inicial || 0)
+      const nuevoEstadoPago = (tipoPagoModal === 'total' || montoPago >= saldoRestante) ? 'pagado' : 'abonado'
+      
+      const ventaAct = await registrarPagoVenta(ventaPago.id, {
+        monto: montoPago,
+        medio_pago: medioPago,
+        estado_pago: nuevoEstadoPago
+      })
+      
+      setVentas(ventas.map(v => v.id === ventaPago.id ? { ...v, ...ventaAct } : v))
+      setVentaPago(null)
+    } catch (err) { alert(err.message) }
+    setProcesandoPago(false)
+  }
+
+  const abrirModalPago = (venta) => {
+    setVentaPago(venta)
+    const saldo = venta.total - (venta.abono_inicial || 0)
+    setMontoPago(saldo)
+    setTipoPagoModal('total')
+    setMedioPago('efectivo')
+  }
 
   const borrar = async (id) => {
     if (!window.confirm('¿Eliminar esta venta?')) return
     try { await eliminarVenta(id); setVentas(ventas.filter(v => v.id !== id)) }
     catch (err) { alert(err.message) }
   }
+
 
   const totalVentas = ventas.reduce((s, v) => s + v.total, 0)
   const cobrado = ventas.filter(v => v.estado_pago === 'pagado').reduce((s, v) => s + v.total, 0)
@@ -132,65 +166,78 @@ function Ventas() {
                 <div key={v.id} className="admin-card p-0" style={{ overflow: 'hidden' }}>
                   {/* Fila principal */}
                   <div
-                    className="d-flex align-items-center gap-3 flex-wrap p-3"
-                    style={{ cursor: 'pointer', borderBottom: abierta ? '1px solid var(--border-color)' : 'none' }}
+                    style={{ cursor: 'pointer', borderBottom: abierta ? '1px solid var(--border-color)' : 'none', padding: '0.75rem 1rem' }}
                     onClick={() => setExpandida(abierta ? null : v.id)}
                   >
-                    {/* ID + fecha */}
-                    <div style={{ minWidth: 80 }}>
-                      <div style={{ fontWeight: 800, color: 'var(--primary-color)', fontSize: '0.85rem' }}>#{v.id}</div>
-                      <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>{formatFecha(v.created_at)}</div>
-                    </div>
-
-                    {/* Cliente */}
-                    <div style={{ flex: 1, minWidth: 120 }}>
-                      <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>{v.cliente_nombre || <span style={{ color: 'var(--text-muted)' }}>Sin cliente</span>}</div>
-                      <div className="d-flex gap-2 align-items-center">
-                         <span style={{ fontSize: '0.6rem', padding: '0.1rem 0.35rem', borderRadius: 4, background: v.tipo_pago === 'credito' ? 'rgba(244,162,97,0.15)' : 'rgba(45,106,79,0.15)', color: v.tipo_pago === 'credito' ? '#f4a261' : '#2d6a4f', fontWeight: 700, textTransform: 'uppercase' }}>
-                          {v.tipo_pago}
-                        </span>
-                        {v.cliente_telefono && <span style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>{v.cliente_telefono}</span>}
+                    {/* Fila 1: ID + Cliente + Total + Chevron */}
+                    <div className="d-flex align-items-center gap-2 mb-2">
+                      {/* ID + fecha */}
+                      <div style={{ minWidth: 60 }}>
+                        <div style={{ fontWeight: 800, color: 'var(--primary-color)', fontSize: '0.82rem' }}>#{v.id}</div>
+                        <div style={{ color: 'var(--text-muted)', fontSize: '0.72rem' }}>{formatFecha(v.created_at)}</div>
                       </div>
+
+                      {/* Cliente */}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 600, color: 'var(--text-main)', fontSize: '0.9rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {v.cliente_nombre || <span style={{ color: 'var(--text-muted)' }}>Sin cliente</span>}
+                        </div>
+                        <div className="d-flex gap-1 align-items-center">
+                          <span style={{ fontSize: '0.6rem', padding: '0.1rem 0.3rem', borderRadius: 4, background: v.tipo_pago === 'credito' ? 'rgba(244,162,97,0.15)' : 'rgba(45,106,79,0.15)', color: v.tipo_pago === 'credito' ? '#f4a261' : '#2d6a4f', fontWeight: 700, textTransform: 'uppercase' }}>
+                            {v.tipo_pago}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Total */}
+                      <div className="text-end" style={{ flexShrink: 0 }}>
+                        <div style={{ fontWeight: 800, color: 'var(--text-main)', fontSize: '0.9rem' }}>{formatCOP(v.total)}</div>
+                        <div style={{ color: 'var(--text-muted)', fontSize: '0.72rem' }}>{v.items?.length || 0} items</div>
+                      </div>
+
+                      <i className={`bi bi-chevron-${abierta ? 'up' : 'down'}`} style={{ color: 'var(--text-muted)', flexShrink: 0 }}></i>
                     </div>
 
-                    {/* Total */}
-                    <div className="text-end" style={{ minWidth: 100 }}>
-                      <div style={{ fontWeight: 800, color: 'var(--text-main)' }}>{formatCOP(v.total)}</div>
-                      <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>{v.items?.length || 0} items</div>
-                    </div>
-
-                    {/* Estado Entrega */}
-                    <div onClick={e => e.stopPropagation()} style={{ minWidth: 130 }} className="flex-fill flex-md-grow-0">
+                    {/* Fila 2: Selectores + Acciones */}
+                    <div className="d-flex align-items-center gap-2 flex-wrap" onClick={e => e.stopPropagation()}>
+                      {/* Estado Entrega */}
                       <select
                         className="form-select form-select-sm"
                         value={v.estado}
                         onChange={e => cambiarEstado(v.id, e.target.value)}
-                        style={{ background: est.color + '22', color: est.color, border: `1px solid ${est.color}44`, fontWeight: 700, borderRadius: 20 }}
+                        style={{ background: est.color + '22', color: est.color, border: `1px solid ${est.color}44`, fontWeight: 700, borderRadius: 20, width: 'auto', flex: '1 1 auto', minWidth: 110, maxWidth: 150 }}
                       >
                         {ESTADOS.map(e => <option key={e.value} value={e.value}>{e.label}</option>)}
                       </select>
-                    </div>
 
-                    {/* Estado Pago */}
-                    <div onClick={e => e.stopPropagation()} style={{ minWidth: 130 }} className="flex-fill flex-md-grow-0">
+                      {/* Estado Pago */}
                       <select
                         className="form-select form-select-sm"
                         value={v.estado_pago}
                         onChange={e => cambiarPago(v.id, e.target.value)}
-                        style={{ background: pInfo.color + '22', color: pInfo.color, border: `1px solid ${pInfo.color}44`, fontWeight: 700, borderRadius: 20 }}
+                        style={{ background: pInfo.color + '22', color: pInfo.color, border: `1px solid ${pInfo.color}44`, fontWeight: 700, borderRadius: 20, width: 'auto', flex: '1 1 auto', minWidth: 120, maxWidth: 160 }}
                       >
                         {ESTADOS_PAGO.map(e => <option key={e.value} value={e.value}>{e.label}</option>)}
                       </select>
-                    </div>
 
-                    {/* Acciones */}
-                    <div onClick={e => e.stopPropagation()} className="d-none d-md-block">
-                      <button onClick={() => borrar(v.id)} className="btn btn-sm btn-outline-danger" title="Eliminar">
-                        <i className="bi bi-trash"></i>
-                      </button>
+                      {/* Acciones */}
+                      <div className="d-flex gap-2 align-items-center ms-auto">
+                        {(v.estado_pago === 'pendiente' || v.estado_pago === 'abonado') && (
+                          <button 
+                            onClick={() => abrirModalPago(v)} 
+                            className="btn btn-sm" 
+                            style={{ background: '#2d6a4f', color: '#fff', borderRadius: 20, fontSize: '0.75rem', padding: '0.2rem 0.75rem', fontWeight: 600, flexShrink: 0 }}
+                          >
+                            💸 Pagar
+                          </button>
+                        )}
+                        <div className="d-none d-md-block">
+                          <button onClick={() => borrar(v.id)} className="btn btn-sm btn-outline-danger" title="Eliminar">
+                            <i className="bi bi-trash"></i>
+                          </button>
+                        </div>
+                      </div>
                     </div>
-
-                    <i className={`bi bi-chevron-${abierta ? 'up' : 'down'}`} style={{ color: 'var(--text-muted)' }}></i>
                   </div>
 
                   {/* Detalle expandible */}
@@ -229,7 +276,14 @@ function Ventas() {
                                 <span style={{ color: 'var(--text-muted)' }}>Vencimiento:</span>
                                 <span style={{ fontWeight: 700, color: '#e63946' }}>{v.fecha_vencimiento ? formatFecha(v.fecha_vencimiento) : 'No definida'}</span>
                               </div>
+                              {v.medio_pago && (
+                                <div className="d-flex justify-content-between mt-1" style={{ fontSize: '0.82rem' }}>
+                                  <span style={{ color: 'var(--text-muted)' }}>Medio de pago:</span>
+                                  <span style={{ fontWeight: 600, color: 'var(--text-main)', textTransform: 'capitalize' }}>{v.medio_pago}</span>
+                                </div>
+                              )}
                             </div>
+
                           )}
                           {v.notas && (
                             <>
@@ -252,7 +306,89 @@ function Ventas() {
           </div>
         )}
       </main>
+
+
+      {/* Modal de Pago */}
+      {ventaPago && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000, padding: '1rem' }} onClick={() => setVentaPago(null)}>
+          <div className="admin-card" style={{ maxWidth: 400, width: '100%', padding: '1.5rem' }} onClick={e => e.stopPropagation()}>
+            <h5 className="mb-3" style={{ fontWeight: 800 }}>Registrar Pago #{ventaPago.id}</h5>
+            
+            <div className="mb-4 p-3 rounded" style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)' }}>
+              <div className="d-flex justify-content-between mb-2">
+                <span style={{ color: 'var(--text-muted)' }}>Total Venta:</span>
+                <span style={{ fontWeight: 700 }}>{formatCOP(ventaPago.total)}</span>
+              </div>
+              <div className="d-flex justify-content-between mb-2">
+                <span style={{ color: 'var(--text-muted)' }}>Abonado:</span>
+                <span style={{ fontWeight: 700, color: '#2d6a4f' }}>{formatCOP(ventaPago.abono_inicial || 0)}</span>
+              </div>
+              <div className="d-flex justify-content-between" style={{ borderTop: '1px dashed var(--border-color)', paddingTop: 8 }}>
+                <span style={{ fontWeight: 700 }}>Saldo Pendiente:</span>
+                <span style={{ fontWeight: 800, color: 'var(--primary-color)', fontSize: '1.1rem' }}>{formatCOP(ventaPago.total - (ventaPago.abono_inicial || 0))}</span>
+              </div>
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label" style={{ fontSize: '0.85rem', fontWeight: 600 }}>Tipo de Pago</label>
+              <div className="d-flex gap-2">
+                <button 
+                  className={`btn btn-sm flex-fill ${tipoPagoModal === 'total' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                  style={tipoPagoModal === 'total' ? { background: 'var(--primary-color)', borderColor: 'var(--primary-color)' } : {}}
+                  onClick={() => { setTipoPagoModal('total'); setMontoPago(ventaPago.total - (ventaPago.abono_inicial || 0)) }}
+                >Pago Total</button>
+                <button 
+                   className={`btn btn-sm flex-fill ${tipoPagoModal === 'abono' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                   style={tipoPagoModal === 'abono' ? { background: 'var(--primary-color)', borderColor: 'var(--primary-color)' } : {}}
+                   onClick={() => setTipoPagoModal('abono')}
+                >Abono Parcial</button>
+              </div>
+            </div>
+
+            {tipoPagoModal === 'abono' && (
+              <div className="mb-3">
+                <label className="form-label" style={{ fontSize: '0.85rem', fontWeight: 600 }}>Monto a pagar</label>
+                <div className="input-group">
+                  <span className="input-group-text">$</span>
+                  <input 
+                    type="number" 
+                    className="form-control" 
+                    value={montoPago} 
+                    onChange={e => setMontoPago(Math.min(ventaPago.total - (ventaPago.abono_inicial || 0), parseInt(e.target.value || 0)))}
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="mb-4">
+              <label className="form-label" style={{ fontSize: '0.85rem', fontWeight: 600 }}>Medio de Pago</label>
+              <select className="form-select" value={medioPago} onChange={e => setMedioPago(e.target.value)}>
+                <option value="efectivo">💵 Efectivo</option>
+                <option value="transferencia">📱 Transferencia</option>
+                <option value="bancolombia">🏦 Bancolombia / Nequi</option>
+              </select>
+            </div>
+
+            <div className="d-flex gap-2">
+              <button 
+                className="btn btn-secondary flex-fill" 
+                onClick={() => setVentaPago(null)}
+                disabled={procesandoPago}
+              >Cancelar</button>
+              <button 
+                className="btn flex-fill" 
+                style={{ background: '#2d6a4f', color: '#fff', fontWeight: 700 }}
+                onClick={confirmarPago}
+                disabled={procesandoPago}
+              >
+                {procesandoPago ? 'Procesando...' : 'Confirmar Pago'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
+
   )
 }
 

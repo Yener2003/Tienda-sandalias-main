@@ -79,7 +79,9 @@ export async function initDB() {
       ALTER TABLE ventas ADD COLUMN IF NOT EXISTS num_cuotas INTEGER DEFAULT 1;
       ALTER TABLE ventas ADD COLUMN IF NOT EXISTS fecha_vencimiento DATE;
       ALTER TABLE ventas ADD COLUMN IF NOT EXISTS abono_inicial INTEGER DEFAULT 0;
+      ALTER TABLE ventas ADD COLUMN IF NOT EXISTS medio_pago VARCHAR(50);
     `);
+
 
     console.log('✅ Base de datos inicializada correctamente');
   } catch (error) {

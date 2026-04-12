@@ -175,8 +175,19 @@ export async function cambiarEstadoPagoVenta(id, estado_pago) {
   if (!res.ok) throw new Error(data.error || 'Error actualizando estado de pago')
   return data.venta
 }
+export async function registrarPagoVenta(id, paymentData) {
+  const res = await fetch(`${API_URL}/api/ventas/${id}/registrar-pago`, {
+    method: 'PATCH',
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(paymentData),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || 'Error registrando pago')
+  return data.venta
+}
 
 export async function eliminarVenta(id) {
+
   const res = await fetch(`${API_URL}/api/ventas/${id}`, {
     method: 'DELETE',
     headers: authHeaders(),

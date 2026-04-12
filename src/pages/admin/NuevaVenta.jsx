@@ -88,7 +88,7 @@ function NuevaVenta() {
         <form onSubmit={guardar}>
           <div className="row g-4">
             {/* Columna izquierda */}
-            <div className="col-lg-8">
+            <div className="col-lg-8 order-1">
 
               {/* Cliente */}
               <div className="admin-card mb-4">
@@ -110,28 +110,42 @@ function NuevaVenta() {
                 {items.map((it, idx) => {
                   const prod = getProducto(it.producto_id)
                   return (
-                    <div key={idx} className="d-flex gap-2 align-items-center mb-3" style={{ background: 'var(--bg-color)', borderRadius: 12, padding: '0.75rem', border: '1px solid var(--border-color)' }}>
-                      {prod?.imagen_principal && (
-                        <img src={prod.imagen_principal} alt={prod.nombre} style={{ width: 44, height: 44, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />
-                      )}
-                      <select className="form-select form-select-sm flex-fill" value={it.producto_id} onChange={e => actualizarItem(idx, 'producto_id', e.target.value)}>
-                        <option value="">— Selecciona producto —</option>
-                        {productos.filter(p => p.activo).map(p => (
-                          <option key={p.id} value={p.id}>{p.nombre} · {formatCOP(p.precio)}</option>
-                        ))}
-                      </select>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-                        <button type="button" onClick={() => actualizarItem(idx, 'cantidad', Math.max(1, parseInt(it.cantidad || 1) - 1))}
-                          style={{ width: 28, height: 28, borderRadius: 6, border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-main)', cursor: 'pointer', fontWeight: 700 }}>−</button>
-                        <span style={{ minWidth: 24, textAlign: 'center', fontWeight: 600, color: 'var(--text-main)' }}>{it.cantidad}</span>
-                        <button type="button" onClick={() => actualizarItem(idx, 'cantidad', parseInt(it.cantidad || 1) + 1)}
-                          style={{ width: 28, height: 28, borderRadius: 6, border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-main)', cursor: 'pointer', fontWeight: 700 }}>+</button>
+                    <div key={idx} className="d-flex gap-2 align-items-center mb-3 flex-wrap" style={{ background: 'var(--bg-color)', borderRadius: 12, padding: '0.75rem', border: '1px solid var(--border-color)' }}>
+                      <div className="d-flex align-items-center gap-2 flex-grow-1" style={{ minWidth: '100%', marginBottom: '0.5rem' }}>
+                        {prod?.imagen_principal && (
+                          <img src={prod.imagen_principal} alt={prod.nombre} style={{ width: 32, height: 32, borderRadius: 6, objectFit: 'cover' }} />
+                        )}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <select className="form-select form-select-sm" value={it.producto_id} onChange={e => actualizarItem(idx, 'producto_id', e.target.value)}>
+                            <option value="">— Selecciona producto —</option>
+                            {productos.filter(p => p.activo).map(p => (
+                              <option key={p.id} value={p.id}>{p.nombre} · {formatCOP(p.precio)}</option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
-                      {prod && <span style={{ color: 'var(--primary-color)', fontWeight: 700, flexShrink: 0, fontSize: '0.9rem' }}>{formatCOP(prod.precio * it.cantidad)}</span>}
-                      {items.length > 1 && (
-                        <button type="button" onClick={() => quitarItem(idx)} style={{ background: 'none', border: 'none', color: '#e63946', cursor: 'pointer', fontSize: '1.1rem', flexShrink: 0 }}>✕</button>
-                      )}
+
+                      <div className="d-flex align-items-center justify-content-between w-100 mt-1">
+                        <div className="d-flex align-items-center gap-2" style={{ background: 'var(--bg-secondary)', padding: '4px 8px', borderRadius: 8 }}>
+                          <button type="button" onClick={() => actualizarItem(idx, 'cantidad', Math.max(1, parseInt(it.cantidad || 1) - 1))}
+                            style={{ width: 28, height: 28, borderRadius: 6, border: 'none', background: 'transparent', color: 'var(--text-main)', cursor: 'pointer', fontWeight: 800 }}>−</button>
+                          <span style={{ minWidth: 20, textAlign: 'center', fontWeight: 700, color: 'var(--text-main)' }}>{it.cantidad}</span>
+                          <button type="button" onClick={() => actualizarItem(idx, 'cantidad', parseInt(it.cantidad || 1) + 1)}
+                            style={{ width: 28, height: 28, borderRadius: 6, border: 'none', background: 'transparent', color: 'var(--text-main)', cursor: 'pointer', fontWeight: 800 }}>+</button>
+                        </div>
+
+                        <div className="d-flex align-items-center gap-3">
+                          <div style={{ fontWeight: 800, color: 'var(--primary-color)', fontSize: '0.95rem' }}>
+                            {prod ? formatCOP(prod.precio * it.cantidad) : '$0'}
+                          </div>
+
+                          {items.length > 1 && (
+                            <button type="button" onClick={() => quitarItem(idx)} style={{ background: 'rgba(230,57,70,0.1)', border: 'none', color: '#e63946', cursor: 'pointer', width: 28, height: 28, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                          )}
+                        </div>
+                      </div>
                     </div>
+
                   )
                 })}
                 <button type="button" onClick={agregarItem} className="btn btn-sm w-100" style={{ background: 'rgba(201,168,76,0.08)', color: 'var(--primary-color)', border: '1px dashed var(--primary-color)', borderRadius: 10 }}>
@@ -142,26 +156,29 @@ function NuevaVenta() {
               {/* Tipo de Pago */}
               <div className="admin-card mb-4">
                 <h6 style={{ color: 'var(--primary-color)', fontWeight: 700, marginBottom: '1rem', textTransform: 'uppercase', fontSize: '0.8rem', letterSpacing: 1 }}>Tipo de Pago</h6>
-                <div className="d-flex gap-3 mb-3">
+                <div className="row g-3">
                   {[
-                    { val: 'contado', label: '💵 Contado', desc: 'Pago inmediato — se marca como pagado automáticamente' },
-                    { val: 'credito', label: '📋 Crédito', desc: 'Pago diferido en cuotas — queda como pendiente de pago' },
+                    { val: 'contado', label: '💵 Contado', desc: 'Pago inmediato' },
+                    { val: 'credito', label: '📋 Crédito', desc: 'Pago diferido' },
                   ].map(opt => (
-                    <div
-                      key={opt.val}
-                      onClick={() => setTipoPago(opt.val)}
-                      style={{
-                        flex: 1, padding: '0.75rem 1rem', borderRadius: 12, cursor: 'pointer',
-                        border: `2px solid ${tipoPago === opt.val ? 'var(--primary-color)' : 'var(--border-color)'}`,
-                        background: tipoPago === opt.val ? 'rgba(201,168,76,0.08)' : 'var(--bg-color)',
-                        transition: 'all 0.2s'
-                      }}
-                    >
-                      <div style={{ fontWeight: 700, color: tipoPago === opt.val ? 'var(--primary-color)' : 'var(--text-main)', fontSize: '0.95rem' }}>{opt.label}</div>
-                      <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem', marginTop: 3 }}>{opt.desc}</div>
+                    <div key={opt.val} className="col-6">
+                      <div
+                        onClick={() => setTipoPago(opt.val)}
+                        style={{
+                          padding: '0.6rem 0.8rem', borderRadius: 12, cursor: 'pointer',
+                          border: `2px solid ${tipoPago === opt.val ? 'var(--primary-color)' : 'var(--border-color)'}`,
+                          background: tipoPago === opt.val ? 'rgba(201,168,76,0.08)' : 'var(--bg-color)',
+                          transition: 'all 0.2s',
+                          height: '100%'
+                        }}
+                      >
+                        <div style={{ fontWeight: 700, color: tipoPago === opt.val ? 'var(--primary-color)' : 'var(--text-main)', fontSize: '0.85rem' }}>{opt.label}</div>
+                        <div style={{ color: 'var(--text-muted)', fontSize: '0.7rem', marginTop: 2 }}>{opt.desc}</div>
+                      </div>
                     </div>
                   ))}
                 </div>
+
 
                 {/* Opciones de crédito */}
                 {tipoPago === 'credito' && (
@@ -171,10 +188,10 @@ function NuevaVenta() {
                         <label className="form-label" style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 600 }}>
                           Abono Inicial (Hoy)
                         </label>
-                        <div className="d-flex gap-2">
+                        <div className="d-flex flex-wrap gap-2" style={{ maxWidth: '100%' }}>
                           {[
                             { val: 'ninguno', label: 'Sin abono' },
-                            { val: 'parcial', label: 'Abono parcial' },
+                            { val: 'parcial', label: 'Parcial' },
                             { val: 'total', label: 'Pagó hoy' },
                           ].map(opt => (
                             <button
@@ -182,12 +199,18 @@ function NuevaVenta() {
                               type="button"
                               className={`btn btn-sm flex-fill ${tipoAbono === opt.val ? 'btn-primary' : 'btn-outline-secondary'}`}
                               onClick={() => setTipoAbono(opt.val)}
-                              style={tipoAbono === opt.val ? { background: 'var(--primary-color)', borderColor: 'var(--primary-color)' } : {}}
+                              style={tipoAbono === opt.val ? { 
+                                background: 'var(--primary-color)', 
+                                borderColor: 'var(--primary-color)',
+                                fontSize: '0.75rem',
+                                fontWeight: 700
+                              } : { fontSize: '0.75rem' }}
                             >
                               {opt.label}
                             </button>
                           ))}
                         </div>
+
                         {tipoAbono === 'parcial' && (
                           <div className="mt-2">
                             <div className="input-group input-group-sm">
@@ -208,16 +231,17 @@ function NuevaVenta() {
                         <label className="form-label" style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 600 }}>
                           Número de cuotas *
                         </label>
-                        <div className="d-flex align-items-center gap-2">
+                        <div className="d-flex align-items-center gap-2" style={{ maxWidth: 220 }}>
                           <button type="button" onClick={() => setNumCuotas(Math.max(2, numCuotas - 1))}
-                            style={{ width: 36, height: 36, borderRadius: 8, border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-main)', cursor: 'pointer', fontWeight: 700, fontSize: '1.1rem' }}>−</button>
+                            style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-main)', cursor: 'pointer', fontWeight: 700, fontSize: '1rem' }}>−</button>
                           <div style={{ textAlign: 'center', flex: 1 }}>
-                            <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--primary-color)', lineHeight: 1 }}>{numCuotas}</div>
-                            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>cuotas</div>
+                            <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--primary-color)', lineHeight: 1 }}>{numCuotas}</div>
+                            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>cuotas</div>
                           </div>
                           <button type="button" onClick={() => setNumCuotas(numCuotas + 1)}
-                            style={{ width: 36, height: 36, borderRadius: 8, border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-main)', cursor: 'pointer', fontWeight: 700, fontSize: '1.1rem' }}>+</button>
+                            style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-main)', cursor: 'pointer', fontWeight: 700, fontSize: '1rem' }}>+</button>
                         </div>
+
                         {saldoPendiente > 0 && (
                           <div style={{ textAlign: 'center', marginTop: '0.4rem', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
                             ≈ {formatCOP(valorCuota)} / cuota
@@ -250,7 +274,7 @@ function NuevaVenta() {
             </div>
 
             {/* Resumen */}
-            <div className="col-lg-4">
+            <div className="col-lg-4 order-2">
               <div className="admin-card" style={{ position: 'sticky', top: '6rem' }}>
                 <h6 style={{ color: 'var(--primary-color)', fontWeight: 700, marginBottom: '1.25rem', textTransform: 'uppercase', fontSize: '0.8rem', letterSpacing: 1 }}>Resumen</h6>
                 {items.filter(it => it.producto_id).length === 0 ? (
