@@ -70,11 +70,12 @@ function ProductoDetalle() {
           {/* Lado Visual (Selector de Colores) */}
           <section className="premium-detail-visual fade-in-up">
             <div className="main-image-display">
+               <div key={imagenActiva} className="premium-image-blob blob-pulse"></div>
                <img
                   key={imagenActiva}
                   src={carrusel[imagenActiva] || producto.imagen_principal}
                   alt={producto.nombre}
-                  className="fade-in"
+                  className="premium-image-enter"
                 />
             </div>
             
