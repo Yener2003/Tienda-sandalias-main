@@ -137,7 +137,7 @@ function FormProducto() {
       <Navbar />
       <main className="main container py-5">
         <div className="row justify-content-center">
-          <div className="col-lg-8 bg-white p-4 rounded shadow-sm">
+          <div className="col-lg-8 admin-card">
             <h2 className="mb-4">{esEdicion ? 'Editar Producto' : 'Nuevo Producto'}</h2>
             
             {error && <div className="alert alert-danger">{error}</div>}

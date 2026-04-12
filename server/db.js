@@ -38,7 +38,48 @@ export async function initDB() {
         created_at TIMESTAMP DEFAULT NOW(),
         updated_at TIMESTAMP DEFAULT NOW()
       );
+
+      CREATE TABLE IF NOT EXISTS clientes (
+        id SERIAL PRIMARY KEY,
+        nombre VARCHAR(150) NOT NULL,
+        telefono VARCHAR(30),
+        email VARCHAR(150),
+        direccion TEXT,
+        created_at TIMESTAMP DEFAULT NOW()
+      );
+
+      CREATE TABLE IF NOT EXISTS ventas (
+        id SERIAL PRIMARY KEY,
+        cliente_id INTEGER REFERENCES clientes(id) ON DELETE SET NULL,
+        estado VARCHAR(30) DEFAULT 'pendiente',
+        estado_pago VARCHAR(20) DEFAULT 'pendiente',
+        tipo_pago VARCHAR(20) DEFAULT 'contado',
+        num_cuotas INTEGER DEFAULT 1,
+        fecha_vencimiento DATE,
+        total INTEGER NOT NULL DEFAULT 0,
+        notas TEXT,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      );
+
+      CREATE TABLE IF NOT EXISTS venta_items (
+        id SERIAL PRIMARY KEY,
+        venta_id INTEGER REFERENCES ventas(id) ON DELETE CASCADE,
+        producto_id INTEGER REFERENCES productos(id) ON DELETE SET NULL,
+        nombre_producto VARCHAR(200),
+        precio_unitario INTEGER NOT NULL,
+        cantidad INTEGER NOT NULL DEFAULT 1
+      );
     `);
+
+    // Migraciones: agregar columnas nuevas si no existen (safe for existing DBs)
+    await client.query(`
+      ALTER TABLE ventas ADD COLUMN IF NOT EXISTS estado_pago VARCHAR(20) DEFAULT 'pendiente';
+      ALTER TABLE ventas ADD COLUMN IF NOT EXISTS tipo_pago VARCHAR(20) DEFAULT 'contado';
+      ALTER TABLE ventas ADD COLUMN IF NOT EXISTS num_cuotas INTEGER DEFAULT 1;
+      ALTER TABLE ventas ADD COLUMN IF NOT EXISTS fecha_vencimiento DATE;
+    `);
+
     console.log('✅ Base de datos inicializada correctamente');
   } catch (error) {
     console.error('❌ Error inicializando la base de datos:', error.message);

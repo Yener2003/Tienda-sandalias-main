@@ -5,6 +5,8 @@ import { initDB } from './db.js';
 import authRoutes from './routes/auth.js';
 import productosRoutes from './routes/productos.js';
 import aiRoutes from './routes/ai.js';
+import clientesRoutes from './routes/clientes.js';
+import ventasRoutes from './routes/ventas.js';
 
 dotenv.config();
 
@@ -25,6 +27,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/auth', authRoutes);
 app.use('/api/productos', productosRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/clientes', clientesRoutes);
+app.use('/api/ventas', ventasRoutes);
 
 // ── Health check ──
 app.get('/api/health', (req, res) => {

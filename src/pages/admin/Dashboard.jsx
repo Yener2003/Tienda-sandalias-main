@@ -5,6 +5,7 @@ import { getProductosAdmin, eliminarProducto } from '../../services/api'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import LoadingSpinner from '../../components/LoadingSpinner'
+import AdminBottomNav from '../../components/AdminBottomNav'
 
 function Dashboard() {
   const [productos, setProductos] = useState([])
@@ -17,7 +18,9 @@ function Dashboard() {
       navigate('/admin/login')
       return
     }
+    document.body.classList.add('admin-body')
     cargarProductos()
+    return () => document.body.classList.remove('admin-body')
   }, [usuario, navigate])
 
   const cargarProductos = async () => {
@@ -62,17 +65,43 @@ function Dashboard() {
           </div>
         </div>
 
-        <div className="mb-4 d-flex gap-2">
+        <div className="mb-4 d-flex gap-2 d-none d-md-flex">
           <Link to="/admin/producto/nuevo" className="btn" style={{ background: '#2d6a4f', color: '#fff' }}>
             + Nuevo Producto
           </Link>
           <Link to="/" className="btn btn-outline-secondary">Ver Tienda Pública</Link>
         </div>
 
-        <div className="table-responsive bg-white p-3 rounded shadow-sm">
-          <table className="table table-hover align-middle">
-            <thead className="table-light">
-              <tr>
+        {/* Módulos rápidos */}
+        <div className="row g-3 mb-4">
+          {[
+            { label: 'Ventas', desc: 'Historial y seguimiento', icon: 'bi-bag-check', path: '/admin/ventas', color: '#2d6a4f' },
+            { label: 'Nueva Venta', desc: 'Registrar una venta', icon: 'bi-plus-circle', path: '/admin/ventas/nueva', color: 'var(--primary-color)' },
+            { label: 'Clientes', desc: 'Gestión de clientes', icon: 'bi-people', path: '/admin/clientes', color: '#4895ef' },
+          ].map(m => (
+            <div key={m.path} className="col-md-4">
+              <Link to={m.path} style={{ textDecoration: 'none' }}>
+                <div className="admin-card d-flex align-items-center gap-3 py-3" style={{ transition: 'transform 0.2s, box-shadow 0.2s' }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(0,0,0,0.25)' }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '' }}
+                >
+                  <div style={{ width: 44, height: 44, borderRadius: 12, background: m.color + '22', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <i className={`bi ${m.icon}`} style={{ color: m.color, fontSize: '1.3rem' }}></i>
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 700, color: 'var(--text-main)', lineHeight: 1.2 }}>{m.label}</div>
+                    <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{m.desc}</div>
+                  </div>
+                </div>
+              </Link>
+            </div>
+          ))}
+        </div>
+
+        <div className="table-responsive admin-card p-3">
+          <table className="table table-hover align-middle" style={{ color: 'var(--text-main)' }}>
+            <thead>
+              <tr style={{ borderBottom: '2px solid var(--border-color)', color: 'var(--text-main)' }}>
                 <th>Img</th>
                 <th>Nombre</th>
                 <th>Precio</th>
@@ -83,16 +112,16 @@ function Dashboard() {
             </thead>
             <tbody>
                {productos.map(p => (
-                <tr key={p.id} style={!p.activo ? { opacity: 0.6, background: '#fcfcfc' } : {}}>
+                <tr key={p.id} style={!p.activo ? { opacity: 0.6, background: 'var(--bg-color)' } : { borderBottom: '1px solid var(--border-color)' }}>
                   <td data-label="Imagen">
-                    <img src={p.imagen_principal} alt={p.nombre} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #eee' }} />
+                    <img src={p.imagen_principal} alt={p.nombre} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--border-color)' }} />
                   </td>
                   <td data-label="Nombre">
-                    <div className="fw-bold">{p.nombre}</div>
+                    <div className="fw-bold" style={{ color: 'var(--text-main)' }}>{p.nombre}</div>
                     {!p.activo && <span className="badge bg-secondary ms-1" style={{ fontSize: '0.65rem' }}>Oculto</span>}
                   </td>
-                  <td data-label="Precio">{new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(p.precio)}</td>
-                  <td data-label="Suela">{p.tipo_suela === 'alta' ? 'Alta' : 'Baja'}</td>
+                  <td data-label="Precio" style={{ color: 'var(--text-main)' }}>{new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(p.precio)}</td>
+                  <td data-label="Suela" style={{ color: 'var(--text-main)' }}>{p.tipo_suela === 'alta' ? 'Alta' : 'Baja'}</td>
                   <td data-label="Estado">
                     <span className={`badge ${p.activo ? 'bg-success' : 'bg-secondary'}`} style={{ borderRadius: '20px', padding: '0.4rem 0.8rem' }}>
                       {p.activo ? 'Activo' : 'Inactivo'}
@@ -112,13 +141,14 @@ function Dashboard() {
               ))}
               {productos.length === 0 && (
                 <tr>
-                  <td colSpan="6" className="text-center py-4">No hay productos registrados.</td>
+                  <td colSpan="6" className="text-center py-4" style={{ color: 'var(--text-muted)' }}>No hay productos registrados.</td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
       </main>
+      <AdminBottomNav />
       <Footer />
     </>
   )

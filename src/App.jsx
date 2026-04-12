@@ -8,6 +8,9 @@ import ProductoDetalle from './pages/ProductoDetalle.jsx'
 import Login from './pages/admin/Login.jsx'
 import Dashboard from './pages/admin/Dashboard.jsx'
 import FormProducto from './pages/admin/FormProducto.jsx'
+import Clientes from './pages/admin/Clientes.jsx'
+import Ventas from './pages/admin/Ventas.jsx'
+import NuevaVenta from './pages/admin/NuevaVenta.jsx'
 
 function App() {
   return (
@@ -25,6 +28,9 @@ function App() {
           <Route path="/admin/dashboard" element={<Dashboard />} />
           <Route path="/admin/producto/nuevo" element={<FormProducto />} />
           <Route path="/admin/producto/:id/editar" element={<FormProducto />} />
+          <Route path="/admin/clientes" element={<Clientes />} />
+          <Route path="/admin/ventas" element={<Ventas />} />
+          <Route path="/admin/ventas/nueva" element={<NuevaVenta />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
@@ -32,3 +38,4 @@ function App() {
 }
 
 export default App
+

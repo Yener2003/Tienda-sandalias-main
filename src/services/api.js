@@ -94,3 +94,94 @@ export async function registrarAdmin(nombre, email, password) {
   if (!res.ok) throw new Error(data.error || 'Error en registro')
   return data
 }
+
+// ── Clientes ──
+export async function getClientes() {
+  const res = await fetch(`${API_URL}/api/clientes`, { headers: authHeaders() })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || 'Error obteniendo clientes')
+  return data.clientes
+}
+
+export async function crearCliente(cliente) {
+  const res = await fetch(`${API_URL}/api/clientes`, {
+    method: 'POST',
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(cliente),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || 'Error creando cliente')
+  return data.cliente
+}
+
+export async function editarCliente(id, cliente) {
+  const res = await fetch(`${API_URL}/api/clientes/${id}`, {
+    method: 'PUT',
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(cliente),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || 'Error editando cliente')
+  return data.cliente
+}
+
+export async function eliminarCliente(id) {
+  const res = await fetch(`${API_URL}/api/clientes/${id}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || 'Error eliminando cliente')
+  return data
+}
+
+// ── Ventas ──
+export async function getVentas() {
+  const res = await fetch(`${API_URL}/api/ventas`, { headers: authHeaders() })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || 'Error obteniendo ventas')
+  return data.ventas
+}
+
+export async function crearVenta(venta) {
+  const res = await fetch(`${API_URL}/api/ventas`, {
+    method: 'POST',
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(venta),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || 'Error creando venta')
+  return data.venta
+}
+
+export async function cambiarEstadoVenta(id, estado) {
+  const res = await fetch(`${API_URL}/api/ventas/${id}/estado`, {
+    method: 'PATCH',
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ estado }),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || 'Error actualizando estado')
+  return data.venta
+}
+
+export async function cambiarEstadoPagoVenta(id, estado_pago) {
+  const res = await fetch(`${API_URL}/api/ventas/${id}/pago`, {
+    method: 'PATCH',
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ estado_pago }),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || 'Error actualizando estado de pago')
+  return data.venta
+}
+
+export async function eliminarVenta(id) {
+  const res = await fetch(`${API_URL}/api/ventas/${id}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || 'Error eliminando venta')
+  return data
+}

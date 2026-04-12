@@ -31,8 +31,8 @@ function Login() {
     <>
       <Navbar />
       <main className="main">
-        <div className="page-title">
-          <div className="container" style={{ maxWidth: '400px', margin: '4rem auto', padding: '2rem', background: '#f9f9f9', borderRadius: '16px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}>
+        <div className="page-title" style={{ background: 'var(--bg-color)' }}>
+          <div className="container admin-card" style={{ maxWidth: '400px', margin: '4rem auto' }}>
             <h2 className="text-center mb-4">Admin Login</h2>
             {error && <div className="alert alert-danger">{error}</div>}
             <form onSubmit={handleSubmit}>
