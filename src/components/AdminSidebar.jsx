@@ -34,10 +34,6 @@ function AdminSidebar() {
       </nav>
 
       <div className="sidebar-footer">
-        <Link to="/" className="sidebar-link mb-2">
-          <i className="bi bi-shop"></i>
-          <span>Ver Tienda</span>
-        </Link>
         <button onClick={logout} className="sidebar-link w-100 border-0 bg-transparent text-danger">
           <i className="bi bi-box-arrow-left"></i>
           <span>Cerrar Sesión</span>

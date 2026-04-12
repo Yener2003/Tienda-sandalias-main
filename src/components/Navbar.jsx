@@ -20,32 +20,36 @@ function Navbar() {
         <div className="d-flex align-items-center">
           <ThemeToggle />
           
-          <nav id="navmenu" className={`navmenu ${menuOpen ? 'open' : ''} ms-3`}>
-            <ul>
-              <li>
-                <Link to="/" className={isActive('/')} onClick={() => setMenuOpen(false)}>
-                  Inicio
-                </Link>
-              </li>
-              <li>
-                <Link to="/#productos" className="" onClick={() => setMenuOpen(false)}>
-                  Productos
-                </Link>
-              </li>
-            </ul>
-          </nav>
+          {!location.pathname.startsWith('/admin') && (
+            <>
+              <nav id="navmenu" className={`navmenu ${menuOpen ? 'open' : ''} ms-3`}>
+                <ul>
+                  <li>
+                    <Link to="/" className={isActive('/')} onClick={() => setMenuOpen(false)}>
+                      Inicio
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/#productos" className="" onClick={() => setMenuOpen(false)}>
+                      Productos
+                    </Link>
+                  </li>
+                </ul>
+              </nav>
 
-          <button
-            className="mobile-nav-toggle ms-2"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle menu"
-          >
-            <i className={`bi ${menuOpen ? 'bi-x' : 'bi-list'}`}></i>
-          </button>
+              <button
+                className="mobile-nav-toggle ms-2"
+                onClick={() => setMenuOpen(!menuOpen)}
+                aria-label="Toggle menu"
+              >
+                <i className={`bi ${menuOpen ? 'bi-x' : 'bi-list'}`}></i>
+              </button>
 
-          <Link className="btn-getstarted d-none d-md-block ms-3" to="/" onClick={() => setMenuOpen(false)}>
-            Inicio
-          </Link>
+              <Link className="btn-getstarted d-none d-md-block ms-3" to="/" onClick={() => setMenuOpen(false)}>
+                Inicio
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>
