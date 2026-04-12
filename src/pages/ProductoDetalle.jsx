@@ -99,34 +99,34 @@ function ProductoDetalle() {
           <section className="premium-detail-content fade-in-up" style={{ animationDelay: '0.2s' }}>
             <nav className="breadcrumbs mb-4" style={{ background: 'none', padding: 0 }}>
               <ol style={{ fontSize: '0.85rem' }}>
-                <li><Link to="/">Inicio</Link></li>
-                <li className="current">{producto.nombre}</li>
+                <li><Link to="/">✨ Inicio</Link></li>
+                <li className="current">Ver Sandalia</li>
               </ol>
             </nav>
 
-            <span className="category-badge">{producto.categoria}</span>
-            <h2>{producto.nombre}</h2>
-            <div className="price-tag">{precio}</div>
+            <span className="category-badge">👡 {producto.categoria}</span>
+            <h2 style={{ fontFamily: '"Playfair Display", serif' }}>{producto.nombre}</h2>
+            <div className="price-tag">{precio} <span style={{ fontSize: '0.9rem', color: '#999', fontWeight: '400' }}>COP</span></div>
             
             <p className="description-text">
-              {producto.descripcion || 'Sin descripción disponible para este modelo premium.'}
+              {producto.descripcion ? `${producto.descripcion} ✨` : 'Déjate cautivar por la elegancia de este diseño único, creado para resaltar tu belleza natural en cada paso. 💖'}
             </p>
 
             <div className="premium-detail-specs">
               <div className="spec-item">
-                <span className="label">Material</span>
+                <span className="label">💎 Material</span>
                 <span className="value">{producto.material}</span>
               </div>
               <div className="spec-item">
-                <span className="label">Suela</span>
-                <span className="value">{producto.tipo_suela === 'alta' ? 'Alta' : 'Baja'}</span>
+                <span className="label">☁️ Comodidad</span>
+                <span className="value">{producto.tipo_suela === 'alta' ? 'Suela Alta' : 'Suela Baja'}</span>
               </div>
               <div className="spec-item">
-                <span className="label">Referencia</span>
+                <span className="label">🔢 Referencia</span>
                 <span className="value">#{producto.id.toString().slice(-4)}</span>
               </div>
               <div className="spec-item">
-                <span className="label">Disponibilidad</span>
+                <span className="label">📏 Tallas</span>
                 <span className="value">{producto.tallas}</span>
               </div>
             </div>

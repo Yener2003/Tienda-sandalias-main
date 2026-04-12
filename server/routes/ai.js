@@ -29,11 +29,13 @@ router.post('/describe', verificarToken, upload.single('imagen'), async (req, re
       }
     };
 
-    const prompt = `Analiza esta imagen de una sandalia y genera un nombre comercial elegante y una descripción creativa y vendedora en español. 
-    Responde ÚNICAMENTE con un objeto JSON válido con este formato:
+    const prompt = `Analiza esta imagen de una sandalia de mujer y genera un nombre comercial elegante y una descripción de marketing IRRESISTIBLE y MUY CONCISA (máximo 2 líneas poéticas). 
+    Incluye 2 o 3 emojis femeninos y elegantes (como ✨, 👡, 💖). 
+    Enfócate en la comodidad, el estilo y el empoderamiento femenino.
+    Responde ÚNICAMENTE con un objeto JSON válido:
     {
       "nombre": "Nombre de la sandalia",
-      "descripcion": "Descripción detallada y persuasiva"
+      "descripcion": "Descripción corta, impactante y con emojis"
     }`;
 
     const result = await model.generateContent([prompt, imageData]);
