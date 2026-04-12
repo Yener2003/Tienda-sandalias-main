@@ -100,8 +100,8 @@ function Ventas() {
 
 
   const totalVentas = ventas.reduce((s, v) => s + v.total, 0)
-  const cobrado = ventas.filter(v => v.estado_pago === 'pagado').reduce((s, v) => s + v.total, 0)
-  const porCobrar = totalVentas - cobrado
+  const cobrado = ventas.reduce((s, v) => s + (v.abono_inicial || 0), 0)
+  const porCobrar = Math.max(0, totalVentas - cobrado)
   const pendientes = ventas.filter(v => v.estado === 'pendiente').length
 
   if (cargando) return (
@@ -275,6 +275,10 @@ function Ventas() {
                               <div className="d-flex justify-content-between" style={{ fontSize: '0.82rem' }}>
                                 <span style={{ color: 'var(--text-muted)' }}>Vencimiento:</span>
                                 <span style={{ fontWeight: 700, color: '#e63946' }}>{v.fecha_vencimiento ? formatFecha(v.fecha_vencimiento) : 'No definida'}</span>
+                              </div>
+                              <div className="d-flex justify-content-between mb-1" style={{ fontSize: '0.82rem' }}>
+                                <span style={{ color: 'var(--text-muted)' }}>Frecuencia:</span>
+                                <span style={{ fontWeight: 600, color: 'var(--text-main)', textTransform: 'capitalize' }}>{v.frecuencia_pago || 'unico'}</span>
                               </div>
                               {v.medio_pago && (
                                 <div className="d-flex justify-content-between mt-1" style={{ fontSize: '0.82rem' }}>

@@ -80,6 +80,7 @@ export async function initDB() {
       ALTER TABLE ventas ADD COLUMN IF NOT EXISTS fecha_vencimiento DATE;
       ALTER TABLE ventas ADD COLUMN IF NOT EXISTS abono_inicial INTEGER DEFAULT 0;
       ALTER TABLE ventas ADD COLUMN IF NOT EXISTS medio_pago VARCHAR(50);
+      ALTER TABLE ventas ADD COLUMN IF NOT EXISTS frecuencia_pago VARCHAR(50) DEFAULT 'unico';
     `);
 
 

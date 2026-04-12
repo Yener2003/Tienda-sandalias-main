@@ -37,7 +37,7 @@ router.get('/', verificarToken, async (req, res) => {
 
 // POST /api/ventas — Crear nueva venta
 router.post('/', verificarToken, async (req, res) => {
-  const { cliente_id, items, notas = '', tipo_pago = 'contado', num_cuotas = 1, fecha_vencimiento = null, abono_inicial = 0, estado_pago = null } = req.body;
+  const { cliente_id, items, notas = '', tipo_pago = 'contado', num_cuotas = 1, fecha_vencimiento = null, abono_inicial = 0, estado_pago = null, frecuencia_pago = 'unico' } = req.body;
 
   if (!items || items.length === 0) {
     return res.status(400).json({ error: 'La venta debe tener al menos un producto' });
@@ -53,9 +53,9 @@ router.post('/', verificarToken, async (req, res) => {
     const final_estado_pago = estado_pago || (tipo_pago === 'contado' ? 'pagado' : 'pendiente');
 
     const { rows: ventaRows } = await client.query(
-      `INSERT INTO ventas (cliente_id, total, notas, estado, estado_pago, tipo_pago, num_cuotas, fecha_vencimiento, abono_inicial)
-       VALUES ($1, $2, $3, 'pendiente', $4, $5, $6, $7, $8) RETURNING *`,
-      [cliente_id || null, total, notas, final_estado_pago, tipo_pago, parseInt(num_cuotas), fecha_vencimiento || null, parseInt(abono_inicial)]
+      `INSERT INTO ventas (cliente_id, total, notas, estado, estado_pago, tipo_pago, num_cuotas, fecha_vencimiento, abono_inicial, frecuencia_pago)
+       VALUES ($1, $2, $3, 'pendiente', $4, $5, $6, $7, $8, $9) RETURNING *`,
+      [cliente_id || null, total, notas, final_estado_pago, tipo_pago, parseInt(num_cuotas), fecha_vencimiento || null, parseInt(abono_inicial), frecuencia_pago]
     );
     const venta = ventaRows[0];
 

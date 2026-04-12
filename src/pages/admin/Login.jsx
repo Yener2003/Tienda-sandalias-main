@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import Navbar from '../../components/Navbar'
@@ -9,8 +9,16 @@ function Login() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [cargando, setCargando] = useState(false)
-  const { login } = useAuth()
+  const { login, usuario, cargando: authCargando } = useAuth()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!authCargando && usuario) {
+      navigate('/admin/dashboard')
+    }
+  }, [usuario, authCargando, navigate])
+
+  if (authCargando) return null
 
   const handleSubmit = async (e) => {
     e.preventDefault()

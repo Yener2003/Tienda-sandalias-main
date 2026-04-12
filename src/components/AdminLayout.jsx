@@ -4,21 +4,22 @@ import { useAuth } from '../context/AuthContext'
 import Navbar from './Navbar'
 import AdminSidebar from './AdminSidebar'
 import AdminBottomNav from './AdminBottomNav'
+import LoadingSpinner from './LoadingSpinner'
 import Footer from './Footer'
 
 function AdminLayout({ children }) {
-  const { usuario } = useAuth()
+  const { usuario, cargando } = useAuth()
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (!usuario) {
+    if (!cargando && !usuario) {
       navigate('/admin/login')
-      return
     }
     document.body.classList.add('admin-body')
     return () => document.body.classList.remove('admin-body')
-  }, [usuario, navigate])
+  }, [usuario, cargando, navigate])
 
+  if (cargando) return <LoadingSpinner />
   if (!usuario) return null
 
   return (

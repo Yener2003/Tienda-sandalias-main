@@ -18,6 +18,7 @@ function NuevaVenta() {
   const [fechaVencimiento, setFechaVencimiento] = useState('')
   const [abonoInicial, setAbonoInicial] = useState(0)
   const [tipoAbono, setTipoAbono] = useState('ninguno') // ninguno | parcial | total
+  const [frecuenciaPago, setFrecuenciaPago] = useState('unico') // unico | semanal | quincenal | mensual
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState('')
 
@@ -42,6 +43,18 @@ function NuevaVenta() {
   const montoAbonoEfectivo = tipoAbono === 'total' ? total : (tipoAbono === 'parcial' ? abonoInicial : 0)
   const saldoPendiente = Math.max(0, total - montoAbonoEfectivo)
   const valorCuota = tipoPago === 'credito' && numCuotas > 0 ? Math.ceil(saldoPendiente / numCuotas) : 0
+  
+  const calcularFechaSiguiente = (fecha, freq) => {
+    if (!fecha) return null
+    const date = new Date(fecha + 'T12:00:00') // Usar mediodía para evitar problemas de zona horaria
+    if (freq === 'semanal') date.setDate(date.getDate() + 7)
+    else if (freq === 'quincenal') date.setDate(date.getDate() + 15)
+    else if (freq === 'mensual') date.setMonth(date.getMonth() + 1)
+    else return null
+    return date
+  }
+
+  const fechaSegundaCuota = numCuotas > 1 ? calcularFechaSiguiente(fechaVencimiento, frecuenciaPago) : null
 
   const guardar = async (e) => {
     e.preventDefault()
@@ -56,6 +69,7 @@ function NuevaVenta() {
       tipo_pago: tipoPago,
       num_cuotas: tipoPago === 'credito' ? numCuotas : 1,
       fecha_vencimiento: tipoPago === 'credito' ? fechaVencimiento : null,
+      frecuencia_pago: tipoPago === 'credito' ? frecuenciaPago : 'unico',
       abono_inicial: tipoPago === 'credito' ? montoAbonoEfectivo : total,
       estado_pago: tipoPago === 'contado' || tipoAbono === 'total' ? 'pagado' : (tipoAbono === 'parcial' && abonoInicial > 0 ? 'abonado' : 'pendiente'),
       items: itemsValidos.map(it => {
@@ -192,7 +206,6 @@ function NuevaVenta() {
                           {[
                             { val: 'ninguno', label: 'Sin abono' },
                             { val: 'parcial', label: 'Parcial' },
-                            { val: 'total', label: 'Pagó hoy' },
                           ].map(opt => (
                             <button
                               key={opt.val}
@@ -232,7 +245,7 @@ function NuevaVenta() {
                           Número de cuotas *
                         </label>
                         <div className="d-flex align-items-center gap-2" style={{ maxWidth: 220 }}>
-                          <button type="button" onClick={() => setNumCuotas(Math.max(2, numCuotas - 1))}
+                          <button type="button" onClick={() => setNumCuotas(Math.max(1, numCuotas - 1))}
                             style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-main)', cursor: 'pointer', fontWeight: 700, fontSize: '1rem' }}>−</button>
                           <div style={{ textAlign: 'center', flex: 1 }}>
                             <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--primary-color)', lineHeight: 1 }}>{numCuotas}</div>
@@ -250,16 +263,43 @@ function NuevaVenta() {
                       </div>
                       <div className="col-sm-6">
                         <label className="form-label" style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 600 }}>
-                          Fecha de vencimiento *
+                          Fecha del primer pago *
                         </label>
                         <input
                           type="date"
                           className="form-control"
                           value={fechaVencimiento}
-                          min={new Date().toISOString().split('T')[0]}
                           onChange={e => setFechaVencimiento(e.target.value)}
                         />
-                        <small style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>Fecha límite del último pago</small>
+                        <small style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>Día que el cliente debe pagar</small>
+                      </div>
+
+                      <div className="col-12 mt-3">
+                        <label className="form-label" style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 600 }}>
+                          Frecuencia de cobro *
+                        </label>
+                        <div className="d-flex flex-wrap gap-2">
+                          {[
+                            { val: 'unico', label: 'Pago Único' },
+                            { val: 'semanal', label: 'Semanal' },
+                            { val: 'quincenal', label: 'Quincenal' },
+                            { val: 'mensual', label: 'Mensual' },
+                          ].map(f => (
+                            <button
+                              key={f.val}
+                              type="button"
+                              className={`btn btn-sm ${frecuenciaPago === f.val ? 'btn-primary' : 'btn-outline-secondary'}`}
+                              onClick={() => setFrecuenciaPago(f.val)}
+                              style={frecuenciaPago === f.val ? { 
+                                background: 'var(--primary-color)', 
+                                borderColor: 'var(--primary-color)',
+                                fontWeight: 700
+                              } : {}}
+                            >
+                              {f.label}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -311,13 +351,27 @@ function NuevaVenta() {
                             <span style={{ fontWeight: 700, color: 'var(--text-main)' }}>{numCuotas} · {formatCOP(valorCuota)} c/u</span>
                           </div>
                           {fechaVencimiento && (
-                            <div className="d-flex justify-content-between">
-                              <span style={{ color: 'var(--text-muted)' }}>Vence</span>
+                            <div className="d-flex justify-content-between mb-1">
+                              <span style={{ color: 'var(--text-muted)' }}>{frecuenciaPago === 'unico' ? 'Vence' : 'Primer pago'}</span>
                               <span style={{ fontWeight: 700, color: '#e63946' }}>
                                 {new Date(fechaVencimiento + 'T00:00:00').toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })}
                               </span>
                             </div>
                           )}
+                          {fechaSegundaCuota && (
+                            <div className="d-flex justify-content-between mb-1">
+                              <span style={{ color: 'var(--text-muted)' }}>Segundo pago</span>
+                              <span style={{ fontWeight: 700, color: 'var(--primary-color)' }}>
+                                {fechaSegundaCuota.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })}
+                              </span>
+                            </div>
+                          )}
+                          <div className="d-flex justify-content-between">
+                            <span style={{ color: 'var(--text-muted)' }}>Frecuencia</span>
+                            <span style={{ fontWeight: 700, color: 'var(--text-main)', textTransform: 'capitalize' }}>
+                              {frecuenciaPago}
+                            </span>
+                          </div>
                         </>
                       )}
                       <div className="d-flex justify-content-between mt-1">

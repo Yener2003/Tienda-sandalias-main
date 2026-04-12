@@ -21,12 +21,14 @@ function Dashboard() {
         getVentas(),
         getClientes()
       ])
-      const totalRevenue = ventas.reduce((acc, v) => acc + v.total, 0)
+      const totalRevenue = ventas.reduce((acc, v) => acc + (v.abono_inicial || 0), 0)
+      const totalPending = ventas.reduce((acc, v) => acc + v.total, 0) - totalRevenue
       setStats({
         products: prods.length,
         sales: ventas.length,
         clients: clientes.length,
-        revenue: totalRevenue
+        revenue: totalRevenue,
+        pending: totalPending
       })
     } catch (err) {
       console.error(err)
@@ -61,12 +63,12 @@ function Dashboard() {
 
         {/* Global Stats Grid */}
         <div className="row g-4 mb-5">
-           {[
-             { label: 'Ingresos Totales', value: formatCOP(stats.revenue), icon: 'bi-graph-up-arrow', color: 'var(--primary-color)', big: true },
-             { label: 'Ventas Realizadas', value: stats.sales, icon: 'bi-cart-check', color: '#2d6a4f' },
-             { label: 'Clientes Registrados', value: stats.clients, icon: 'bi-people', color: '#4895ef' },
-             { label: 'Productos en Catálogo', value: stats.products, icon: 'bi-box-seam', color: '#f4a261' },
-           ].map((s, i) => (
+            {[
+              { label: 'Recaudado Real', value: formatCOP(stats.revenue), icon: 'bi-cash-coin', color: '#2d6a4f', big: true },
+              { label: 'Por Cobrar', value: formatCOP(stats.pending), icon: 'bi-clock-history', color: '#f4a261', big: true },
+              { label: 'Ventas Realizadas', value: stats.sales, icon: 'bi-bag-check', color: 'var(--primary-color)' },
+              { label: 'Clientes', value: stats.clients, icon: 'bi-people', color: '#4895ef' },
+            ].map((s, i) => (
              <div key={i} className="col-12 col-md-6 col-lg-3">
                <div className="admin-card stats-card">
                  <div style={{ width: 50, height: 50, borderRadius: '50%', background: s.color + '15', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.5rem' }}>
