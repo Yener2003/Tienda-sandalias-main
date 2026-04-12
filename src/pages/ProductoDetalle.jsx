@@ -1,9 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import { Pagination, Autoplay } from 'swiper/modules'
-import 'swiper/css'
-import 'swiper/css/pagination'
 import Navbar from '../components/Navbar.jsx'
 import Footer from '../components/Footer.jsx'
 import LoadingSpinner from '../components/LoadingSpinner.jsx'
@@ -15,6 +11,7 @@ function ProductoDetalle() {
   const navigate = useNavigate()
   const [producto, setProducto] = useState(null)
   const [cargando, setCargando] = useState(true)
+  const [imagenActiva, setImagenActiva] = useState(0)
 
   // Scroll al top y cargar producto
   useEffect(() => {
@@ -50,17 +47,17 @@ function ProductoDetalle() {
     )
   }
 
-  // Mapear campos del backend a los esperados por el helper (si es necesario)
+  // Mapear campos del backend a los esperados por el helper
   const productoParaWhatsApp = {
     ...producto,
-    tipoSuela: producto.tipo_suela, // El helper usa camelCase en el código original de productos.js
+    tipoSuela: producto.tipo_suela,
   }
 
   const precio = formatearPrecio(producto.precio)
   const mensaje = generarMensajeWhatsApp(productoParaWhatsApp)
   const whatsappUrl = `https://wa.me/+573157832101?text=${encodeURIComponent(mensaje)}`
 
-  // Las imágenes del carrusel vienen como JSON string o array dependiendo del driver de pg
+  // Las imágenes del carrusel vienen como JSON string o array
   const carrusel = Array.isArray(producto.imagenes_carrusel) 
     ? producto.imagenes_carrusel 
     : JSON.parse(producto.imagenes_carrusel || '[]')
@@ -70,29 +67,30 @@ function ProductoDetalle() {
       <Navbar />
       <main className="main">
         <div className="premium-detail-container">
-          {/* Lado Visual (Carrusel) */}
+          {/* Lado Visual (Selector de Colores) */}
           <section className="premium-detail-visual fade-in-up">
-            <Swiper
-              modules={[Pagination, Autoplay]}
-              pagination={{ clickable: true }}
-              autoplay={{ delay: 5000 }}
-              loop={true}
-              speed={1000}
-              className="premium-swiper"
-            >
-              {carrusel.map((img, index) => (
-                <SwiperSlide key={index}>
-                  <img
-                    src={img}
-                    alt={`${producto.nombre} - imagen ${index + 1}`}
-                    onLoad={() => console.log('Imagen cargada')}
-                    onError={(e) => {
-                      e.target.src = producto.imagen_principal
-                    }}
-                  />
-                </SwiperSlide>
-              ))}
-            </Swiper>
+            <div className="main-image-display">
+               <img
+                  key={imagenActiva}
+                  src={carrusel[imagenActiva] || producto.imagen_principal}
+                  alt={producto.nombre}
+                  className="fade-in"
+                />
+            </div>
+            
+            {carrusel.length > 1 && (
+              <div className="variant-selector">
+                {carrusel.map((img, index) => (
+                  <div 
+                    key={index} 
+                    className={`variant-dot ${imagenActiva === index ? 'active' : ''}`}
+                    onClick={() => setImagenActiva(index)}
+                  >
+                    <img src={img} alt={`Color ${index + 1}`} />
+                  </div>
+                ))}
+              </div>
+            )}
           </section>
 
           {/* Lado de Contenido */}
