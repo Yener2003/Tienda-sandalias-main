@@ -13,6 +13,7 @@ import Clientes from './pages/admin/Clientes.jsx'
 import Ventas from './pages/admin/Ventas.jsx'
 import NuevaVenta from './pages/admin/NuevaVenta.jsx'
 import ProductosAdmin from './pages/admin/ProductosAdmin.jsx'
+import Perfil from './pages/admin/Perfil.jsx'
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
           <Route path="/admin/ventas" element={<Ventas />} />
           <Route path="/admin/ventas/nueva" element={<NuevaVenta />} />
           <Route path="/admin/productos" element={<ProductosAdmin />} />
+          <Route path="/admin/perfil" element={<Perfil />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

@@ -11,7 +11,8 @@ function AdminSidebar() {
     { label: 'Ventas', path: '/admin/ventas', icon: 'bi-bag-check' },
     { label: 'Clientes', path: '/admin/clientes', icon: 'bi-people' },
     { label: 'Productos', path: '/admin/productos', icon: 'bi-box-seam' },
-    { label: 'Nueva Venta', path: '/admin/ventas/nueva', icon: 'bi-plus-circle' }
+    { label: 'Nueva Venta', path: '/admin/ventas/nueva', icon: 'bi-plus-circle' },
+    { label: 'Mi Perfil', path: '/admin/perfil', icon: 'bi-person-gear' }
   ]
 
   return (

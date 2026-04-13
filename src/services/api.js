@@ -196,3 +196,26 @@ export async function eliminarVenta(id) {
   if (!res.ok) throw new Error(data.error || 'Error eliminando venta')
   return data
 }
+
+// ── Perfil / Usuario ──
+export async function actualizarPerfil(perfilData) {
+  const res = await fetch(`${API_URL}/api/auth/profile`, {
+    method: 'PUT',
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(perfilData),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || 'Error actualizando el perfil')
+  return data
+}
+
+export async function actualizarPassword(passwordData) {
+  const res = await fetch(`${API_URL}/api/auth/password`, {
+    method: 'PUT',
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(passwordData),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || 'Error actualizando la contraseña')
+  return data
+}

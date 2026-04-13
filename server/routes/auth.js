@@ -143,4 +143,82 @@ router.get('/me', verificarToken, async (req, res) => {
   }
 });
 
+// ──────────────────────────────────────────
+// PUT /api/auth/profile — Actualizar datos del perfil
+// ──────────────────────────────────────────
+router.put(
+  '/profile',
+  verificarToken,
+  [
+    body('nombre').trim().notEmpty().withMessage('El nombre es requerido'),
+    body('email').isEmail().withMessage('Email inválido'),
+  ],
+  async (req, res) => {
+    const errores = validationResult(req);
+    if (!errores.isEmpty()) return res.status(400).json({ errores: errores.array() });
+
+    try {
+      const { nombre, email } = req.body;
+      
+      // Verificar si el email ya lo tiene otro usuario
+      const { rows: duplicate } = await pool.query(
+        'SELECT id FROM usuarios WHERE email = $1 AND id != $2',
+        [email, req.usuario.id]
+      );
+      if (duplicate.length > 0) {
+        return res.status(400).json({ error: 'El correo electrónico ya está en uso por otro administrador.' });
+      }
+
+      const { rows } = await pool.query(
+        'UPDATE usuarios SET nombre = $1, email = $2 WHERE id = $3 RETURNING id, nombre, email, rol',
+        [nombre, email, req.usuario.id]
+      );
+
+      res.json({ mensaje: 'Perfil actualizado', usuario: rows[0] });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  }
+);
+
+// ──────────────────────────────────────────
+// PUT /api/auth/password — Cambiar contraseña
+// ──────────────────────────────────────────
+router.put(
+  '/password',
+  verificarToken,
+  [
+    body('currentPassword').notEmpty().withMessage('La contraseña actual es requerida'),
+    body('newPassword').isLength({ min: 6 }).withMessage('La nueva contraseña debe tener al menos 6 caracteres'),
+  ],
+  async (req, res) => {
+    const errores = validationResult(req);
+    if (!errores.isEmpty()) return res.status(400).json({ errores: errores.array() });
+
+    try {
+      const { currentPassword, newPassword } = req.body;
+
+      // Obtener hash actual
+      const { rows } = await pool.query('SELECT password_hash FROM usuarios WHERE id = $1', [req.usuario.id]);
+      const user = rows[0];
+
+      // Verificar contraseña actual
+      const matched = await bcrypt.compare(currentPassword, user.password_hash);
+      if (!matched) {
+        return res.status(401).json({ error: 'La contraseña actual es incorrecta.' });
+      }
+
+      // Encriptar nueva
+      const newHash = await bcrypt.hash(newPassword, 12);
+      await pool.query('UPDATE usuarios SET password_hash = $1 WHERE id = $2', [newHash, req.usuario.id]);
+
+      res.json({ mensaje: 'Contraseña actualizada correctamente' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  }
+);
+
 export default router;
