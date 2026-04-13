@@ -27,6 +27,34 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
+  // Cierre de sesión por inactividad (30 minutos)
+  useEffect(() => {
+    if (!usuario) return
+
+    let timeoutId
+    const INACTIVITY_LIMIT = 30 * 60 * 1000 // 30 minutos
+
+    const resetTimer = () => {
+      if (timeoutId) clearTimeout(timeoutId)
+      timeoutId = setTimeout(() => {
+        logout()
+        alert('Sesión cerrada por inactividad')
+      }, INACTIVITY_LIMIT)
+    }
+
+    // Eventos que cuentan como actividad
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart']
+    events.forEach(event => document.addEventListener(event, resetTimer))
+
+    // Iniciar el primer timer
+    resetTimer()
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId)
+      events.forEach(event => document.removeEventListener(event, resetTimer))
+    }
+  }, [usuario])
+
   const login = async (email, password) => {
     const res = await fetch(`${API_URL}/api/auth/login`, {
       method: 'POST',
